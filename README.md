@@ -23,7 +23,7 @@ one explicitly as `/flow:<name>`.
 | `pr` | Commit, push, open a PR | no (explicit only) |
 
 Agents: `java-developer`, `python-developer`, `frontend-developer`, `database-engineer` (workers),
-`reviewer` (opus, read-only), `test-writer`, `security-auditor` (opus, read-only, conditional).
+`reviewer` (sonnet, read-only), `test-writer`, `security-auditor` (opus for auth/crypto/secrets/payments, sonnet otherwise; read-only, conditional).
 
 Hooks (`plugins/flow/hooks/`) block secret-file access and unsafe git for you and all agents.
 

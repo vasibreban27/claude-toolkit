@@ -1,7 +1,7 @@
 {
   "name": "flow",
   "description": "Brainstorm, plan, build, review and open PRs with agents",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "author": {
     "name": "Breban Vasile-Sergiu"
   }

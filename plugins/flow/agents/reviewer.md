@@ -2,7 +2,7 @@
 name: reviewer
 description: Reviews a code diff for correctness bugs, missing tests and unnecessary complexity. Read-only. Returns numbered findings.
 tools: Read, Grep, Glob, Bash
-model: opus
+model: sonnet
 color: red
 ---
 
