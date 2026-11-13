@@ -19,7 +19,7 @@ Each task has a `Status:` line. You are the only one who edits it; workers never
 
 ## For each wave, in order
 1. Record the base commit: `BASE=$(git rev-parse HEAD)`.
-2. Launch every task of the wave in parallel, one agent per task, with the worker named in the plan (`java-developer`, `python-developer`, `frontend-developer`, `database-engineer`). Prompt = the plan path and the task id only; workers read the rest from disk.
+2. Launch every task of the wave in parallel, one agent per task, with the worker named in the plan (`java-developer`, `python-developer`, `node-developer`, `frontend-developer`, `database-engineer`). Prompt = the plan path and the task id only; workers read the rest from disk.
 3. Collect the reports (each is `Task: <id> – done | partial | blocked`). Keep only the status line and any notes in your context. Mark `done` tasks `[~] built`.
 4. If any task is `partial` or `blocked`, mark it `[!] blocked: <note>` in the plan, stop and show me the notes. Do not start the next wave.
 5. Use the `verify` skill with range `$BASE..HEAD` and the plan path for this wave. When it passes, mark the wave's tasks `[x] verified` and commit the plan file (`docs(plan): wave N verified`). Do not start the next wave until then.

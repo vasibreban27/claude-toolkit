@@ -23,7 +23,8 @@ Run the project's compile/lint/test commands (from `CLAUDE.md`, `package.json`, 
    | `.java` | `java-developer` |
    | `.py` | `python-developer` |
    | `.sql`, migrations, Mongo schema/index files | `database-engineer` |
-   | Angular or React files (`.ts`, `.tsx`, `.html`, `.scss` in the UI app) | `frontend-developer` |
+   | Node/TypeScript outside the UI: Electron main process, preload, IPC, services, scripts | `node-developer` |
+   | Angular or React files (`.ts`, `.tsx`, `.html`, `.scss` in the UI app / renderer) | `frontend-developer` |
    | anything else | you fix it in the main thread; do not spawn an agent |
 
    When delegating, pass the finding in full (id, file:line, problem, scenario, suggested fix, failing test output). Say explicitly: this is a fix assignment, the finding is the task, the files named in the finding are the files it owns (overriding the plan's `Owns`), use the finding id where a task id is expected. Findings in different files go out in parallel; findings in the same file go to one worker together. Minor findings: fix only if trivial, otherwise list them in the final report.

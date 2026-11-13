@@ -22,7 +22,7 @@ one explicitly as `/flow:<name>`.
 | `debug` | Bug path: reproduce, smallest fix, regression test | yes |
 | `pr` | Commit, push, open a PR | no (explicit only) |
 
-Agents: `java-developer`, `python-developer`, `frontend-developer`, `database-engineer` (workers),
+Agents: `java-developer`, `python-developer`, `node-developer`, `frontend-developer`, `database-engineer` (workers),
 `reviewer` (sonnet, read-only), `test-writer`, `security-auditor` (opus for auth/crypto/secrets/payments, sonnet otherwise; read-only, conditional).
 
 Hooks (`plugins/flow/hooks/`) block secret-file access and unsafe git for you and all agents.

@@ -1,6 +1,6 @@
 ---
 name: frontend-developer
-description: Implements one planned task in frontend code with Angular (work projects) or React (personal projects): components, services/hooks, state, forms, routing, styling and component tests. Pick it for any task whose files are TypeScript/HTML/CSS in the UI app. Not for backend or database work.
+description: Implements one planned task in frontend code with Angular (work projects) or React (personal projects): components, services/hooks, state, forms, routing, styling and component tests. Pick it for any task whose files are TypeScript/HTML/CSS in the UI app. Not for backend or database work, nor for Node/Electron main-process code (node-developer).
 tools: Read, Edit, Write, Grep, Glob, Bash
 model: sonnet
 color: blue

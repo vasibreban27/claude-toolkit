@@ -44,7 +44,7 @@ List every endpoint with method, path, auth, request/response DTO fields and typ
 ```
 ### T1: <title>
 - Status: [ ] todo
-- Worker: java-developer | python-developer | frontend-developer | database-engineer
+- Worker: java-developer | python-developer | node-developer | frontend-developer | database-engineer
 - Contract: <endpoint(s) from the API contract, or none>
 - Owns: <files or directories this task may change>
 - Depends on: <task ids or none>
@@ -62,7 +62,7 @@ List every endpoint with method, path, auth, request/response DTO fields and typ
 - Tasks must name real paths found during exploration, not guesses.
 
 ## Phase 4: Hand-off
-Show the user a short summary of the plan (goal, wave count, task list with workers) and ask for corrections. Once confirmed, end by telling the user the next step: run `/flow:build docs/plans/<task-slug>.md`, which dispatches each wave to the workers (`flow:java-developer`, `flow:python-developer`, `flow:frontend-developer`, `flow:database-engineer`), reviews after every wave and fixes findings. If the plan has a single task in one file, say it is small enough to skip the agents.
+Show the user a short summary of the plan (goal, wave count, task list with workers) and ask for corrections. Once confirmed, end by telling the user the next step: run `/flow:build docs/plans/<task-slug>.md`, which dispatches each wave to the workers (`flow:java-developer`, `flow:python-developer`, `flow:node-developer`, `flow:frontend-developer`, `flow:database-engineer`), reviews after every wave and fixes findings. If the plan has a single task in one file, say it is small enough to skip the agents.
 
 ## Never
 - Write or edit code, tests or config.
