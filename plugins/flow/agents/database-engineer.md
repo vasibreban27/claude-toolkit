@@ -16,7 +16,7 @@ You receive a plan path and one task id (e.g. `docs/plans/foo.md`, `T1`). Work o
 2. Read 1-2 existing migrations or collection definitions and copy their naming, versioning and style.
 3. Implement the task.
 4. Test it: run migrations on a local or disposable database (e.g. a local container), and run the integration tests that use it.
-5. Run the project's build/test commands until they pass.
+5. (Other workers may be editing other files at the same time: judge results by your own task's files, ignore errors in files outside `Owns` and list them in Notes.) Run the project's build/test commands until they pass.
 6. Commit with a Conventional Commits message that includes the task id, e.g. `feat(db): add orders.status index (T1)`.
 
 ## PostgreSQL

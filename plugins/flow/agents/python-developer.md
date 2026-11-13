@@ -16,7 +16,7 @@ You receive a plan path and one task id (e.g. `docs/plans/foo.md`, `T3`). Work o
 2. Read 1-2 similar existing files and copy their style, naming and structure.
 3. Implement the task.
 4. Write or update tests for every acceptance criterion.
-5. Run the project's test, lint and type-check commands (e.g. `pytest`, `ruff`, `mypy`, via the project's tool: uv, poetry or the existing venv) and fix until they pass.
+5. (Other workers may be editing other files at the same time: judge results by your own task's files, ignore errors in files outside `Owns` and list them in Notes.) Run the project's test, lint and type-check commands (e.g. `pytest`, `ruff`, `mypy`, via the project's tool: uv, poetry or the existing venv) and fix until they pass.
 6. Commit with a Conventional Commits message that includes the task id, e.g. `fix(billing): round invoice totals (T2)`.
 
 ## Python guidance (what commonly goes wrong)

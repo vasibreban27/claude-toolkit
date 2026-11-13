@@ -16,7 +16,7 @@ You receive a plan path and one task id (e.g. `docs/plans/foo.md`, `T3`). Work o
 2. Check `package.json` and `tsconfig.json` for the runtime, module system (ESM/CJS), strictness and test runner. Read 1-2 similar existing files and copy their structure, naming and error handling.
 3. Implement the task.
 4. Write or update tests for every acceptance criterion.
-5. Run the project's typecheck, lint and test commands (from `package.json` scripts) and fix until they pass.
+5. (Other workers may be editing other files at the same time: judge results by your own task's files, ignore errors in files outside `Owns` and list them in Notes.) Run the project's typecheck, lint and test commands (from `package.json` scripts) and fix until they pass.
 6. Commit with a Conventional Commits message that includes the task id, e.g. `feat(projects): list projects over IPC (T2)`.
 
 ## Guidance (what commonly goes wrong)

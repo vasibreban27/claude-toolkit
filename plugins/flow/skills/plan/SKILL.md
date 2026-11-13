@@ -29,6 +29,7 @@ Create `docs/plans/<task-slug>.md` (kebab-case slug) with these sections:
 5. **Risks**: and how each is mitigated
 6. **Test strategy**: unit, integration, component; what is deliberately not tested
 7. **Tasks**: grouped in waves
+8. **Follow-ups**: leave it as an empty heading; `build` appends minor findings and caveats here so they are not lost in chat
 
 ### API contract (only when an API is added or changed)
 Contract first: both the backend and frontend tasks implement this, so define it before the tasks. Keep it compact, no prose:
@@ -56,7 +57,9 @@ List every endpoint with method, path, auth, request/response DTO fields and typ
 - One worker per task. Pick the worker by stack; split a task if it spans two stacks (e.g. migration vs. service code).
 - Keep each task small enough for one commit and one focused context.
 - A wave contains tasks that can run in parallel. Tasks in the same wave must not own the same file. If they would, move one to a later wave.
+- A task that uses a dependency, type, file or config created by another task goes in a **later wave**, never the same one. A task that adds a dependency owns `package.json`/`pom.xml` and the lockfile alone in its wave.
 - Database tasks normally come in an earlier wave than the code that uses them.
+- **Smoke task**: if the plan adds or changes runtime wiring of an app with a UI or shell (preload/IPC, routes, dependency injection, entry points, startup config), end with a final `Smoke` task that launches the app and checks the wiring at runtime (e.g. the bridge object exists, one IPC/API round-trip works, the page renders). Automate it if a launch test exists or is cheap to add; otherwise the task writes `docs/notes/<slug>-manual-check.md` with exact steps. Unit tests and builds cannot catch a broken launch.
 - With an API contract, backend and frontend tasks can share a wave: both build against the contract, not against each other's code.
 - Every acceptance criterion must be checkable by a test or a command.
 - Tasks must name real paths found during exploration, not guesses.

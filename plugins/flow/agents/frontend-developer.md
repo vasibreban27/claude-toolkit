@@ -16,7 +16,7 @@ You receive a plan path and one task id (e.g. `docs/plans/foo.md`, `T3`). Work o
 2. Check `package.json` for the framework and version. Read 1-2 similar existing components and copy their structure, naming, styling approach and state handling.
 3. Implement the task.
 4. Write or update component tests for every acceptance criterion.
-5. Run the project's lint, build and test commands (from `package.json` scripts) and fix until they pass.
+5. (Other workers may be editing other files at the same time: judge results by your own task's files, ignore errors in files outside `Owns` and list them in Notes.) Run the project's lint, build and test commands (from `package.json` scripts) and fix until they pass.
 6. Commit with a Conventional Commits message that includes the task id, e.g. `feat(orders-ui): add cancel dialog (T4)`.
 
 ## Guidance (what commonly goes wrong)
