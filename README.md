@@ -9,12 +9,22 @@ Personal Claude Code plugin marketplace.
 
 ## flow
 
-Brainstorm, plan, build, review and open PRs with agents.
+Plan, build, verify and ship with agents. Everything is a skill: just describe what you want
+("plan a cancel-order endpoint", "build docs/plans/foo.md", "review my changes"), or invoke
+one explicitly as `/flow:<name>`.
 
-| Command | Purpose |
-|---|---|
-| `/flow:brainstorm` | Explore options before planning |
-| `/flow:plan` | Produce an implementation plan |
-| `/flow:build` | Implement the plan |
-| `/flow:review` | Review current changes |
-| `/flow:pr` | Commit, push, open a PR |
+| Skill | Purpose | Auto-triggers |
+|---|---|---|
+| `plan` | Brainstorm, pick an approach, write `docs/plans/<slug>.md` | yes |
+| `build` | Run a plan wave by wave with the worker agents | yes |
+| `verify` | Review, fill test gaps, fix findings (bounded loop) | yes |
+| `review` | Read-only review, no fixes | yes |
+| `debug` | Bug path: reproduce, smallest fix, regression test | yes |
+| `pr` | Commit, push, open a PR | no (explicit only) |
+
+Agents: `java-developer`, `python-developer`, `frontend-developer`, `database-engineer` (workers),
+`reviewer` (opus, read-only), `test-writer`, `security-auditor` (opus, read-only, conditional).
+
+Hooks (`plugins/flow/hooks/`) block secret-file access and unsafe git for you and all agents.
+
+See [GUIDE.md](GUIDE.md) for how it all works together.
