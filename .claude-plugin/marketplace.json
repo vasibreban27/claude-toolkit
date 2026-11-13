@@ -1,0 +1,16 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "claude-toolkit",
+  "description": "My reusable Claude Code workflow for work and personal projects",
+  "owner": {
+    "name": "Breban Vasile-Sergiu"
+  },
+  "plugins": [
+    {
+      "name": "flow",
+      "description": "Brainstorm, plan, build, review and open PRs with agents",
+      "source": "./plugins/flow",
+      "category": "development"
+    }
+  ]
+}
