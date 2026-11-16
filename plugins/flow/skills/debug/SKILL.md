@@ -1,6 +1,6 @@
 ---
 name: debug
-description: Lightweight path for fixing a bug, failing test or unexpected behavior - reproduce, hypothesize, smallest fix, regression test, then verify. Use when the user reports a bug, an error, a stack trace or something that "doesn't work", instead of planning a feature.
+description: Fix a bug, failing test or error: reproduce, smallest fix, regression test, verify. Use when something "doesn't work".
 argument-hint: <bug description, error message or failing test>
 ---
 

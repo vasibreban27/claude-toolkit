@@ -30,7 +30,7 @@ Look:     review   (read-only, fixes nothing)
    - collects short reports (`Task: T3 – done | partial | blocked`),
    - runs `verify` on the wave's commits before starting the next wave,
    - ticks `Status:` in the plan: `[ ] todo` → `[~] built` → `[x] verified`, or `[!] blocked`.
-4. **`verify`** (per wave): compile/lint/tests first; then `reviewer` (always) and `security-auditor` (only if the diff touches auth, input handling, query building, secrets or uploads) in parallel; `test-writer` fills gaps once; the matching worker fixes each finding; re-review only what changed. Max 3 rounds, then it asks you.
+4. **`verify`** (per wave): compile/lint/tests first; then `reviewer` (always) and `security-auditor` (only if the diff touches auth, input handling, query building, secrets or uploads) in parallel; `test-writer` fills gaps once (round 1 only); the matching worker fixes each finding and adds its regression test; re-review only what changed. Max 3 rounds, then it asks you.
 5. **"Open a PR"** → `/flow:pr`. This one is explicit-only, because it pushes.
 
 ### Stopping and resuming
@@ -56,18 +56,24 @@ The plan file is the memory. Close the session whenever; later say "continue bui
 
 ## Hooks: rules that always apply
 
-`hooks/guard.js` runs before every `Read/Edit/Write/Grep/Glob/Bash` call, for you and for every subagent. A block returns the reason to the agent so it can adapt.
+`hooks/guard.js` runs before every `Read/Edit/Write/Grep/Glob/Bash/PowerShell` call, for you and for every subagent. A block returns the reason to the agent so it can adapt.
 
 | Rule | Blocked |
 |---|---|
 | No secrets | `.env`, `.env.*` (not `.example/.sample/.template`), `*.pem/*.key/*.p12/*.jks`, SSH private keys, `credentials*`, `secrets*`, `application-prod.*` |
 | No env dumps | `printenv`, bare `env`/`set` |
-| Safe git | force push, push to `main`/`master`, `--no-verify`, recursive delete of `/`, `~`, `.`, `*` |
-| Subagents | never `git push`, `merge`, `checkout`/`switch` (only the `pr` skill or you publish) |
+| Safe git | force push, any push that lands on `main`/`master` (`origin main`, `HEAD:main`, `HEAD:refs/heads/main`, a bare `git push` while on main), `--no-verify`, recursive delete of `/`, `~`, `.`, `*` |
+| Subagents | never `git push`, `merge`, `checkout`/`switch` (only the `pr` skill or you publish); stage and commit by explicit path only (`git add -- files`, `git commit -m msg -- files`; no `add -A`/`.`, no `commit -a`), because workers share one checkout |
 | Protected paths (writes) | lockfiles (`package-lock.json`, `yarn.lock`, `pnpm-lock.yaml`, `poetry.lock`, `uv.lock`, …) → use the package manager; generated code (`generated/`, `generated-sources/`, `__generated__/`, `*.generated.*`) → change the source and regenerate; **applied migrations** (Flyway/Liquibase/`migrations/` files that already exist on `main`) → add a new migration. Migrations created on your feature branch stay editable, and Flyway `R__` repeatable ones too. |
 | Noise directories (reads) | Read/Grep/Glob inside `node_modules`, `.git`, `.venv`, `venv`, `__pycache__`, `.angular`, `.next`, `.gradle`, `.idea`; `target`, `dist`, `build`, `out`, `coverage` when they are a top-level or module folder (a Java package named `build` is fine); `*.min.js/css`, `*.map`. Saves tokens. |
 
 Escape hatches, for the rare case you really want it: set `FLOW_ALLOW_NOISE=1` or `FLOW_ALLOW_PROTECTED=1` before starting Claude (or in the `env` block of your settings). The secret-file rules have no escape hatch on purpose.
+
+Bare words such as "credentials" or "secrets" in a search or commit message are fine, and so are source files like `secrets/store.ts`; only data/config files (`secrets.json`, `credentials.yml`, `secrets/db.txt`) are blocked.
+
+Tests: `node --test plugins/flow/hooks/guard.test.js`. Add a case to the table there with every rule you add.
+
+Agent reports end with a one-line `REPORT_JSON: {...}` footer, and a `STOP: <code>: <reason>` line when the agent cannot finish, so the app can parse them. Agents have a `maxTurns` cap in their frontmatter (Claude Code returns the output marked partial when it is hit).
 
 Add a rule: add a line in `guard.js` with a regex and a `block("reason")`. Test it by piping a sample, e.g.
 `echo '{"tool_name":"Bash","tool_input":{"command":"cat .env"}}' | node plugins/flow/hooks/guard.js; echo $?` → prints the reason and `2`.

@@ -1,6 +1,6 @@
 ---
 name: pr
-description: Commit, push the current branch and open a pull request with gh. Pushes to the remote, so it only runs when explicitly invoked.
+description: Commit, push and open a PR with gh. Pushes, so explicit invocation only.
 argument-hint: <base branch>
 disable-model-invocation: true
 ---

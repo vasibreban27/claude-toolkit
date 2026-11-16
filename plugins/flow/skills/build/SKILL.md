@@ -1,6 +1,6 @@
 ---
 name: build
-description: Execute an existing, approved plan from docs/plans/ by dispatching its tasks to the worker agents wave by wave, verifying after each wave. Use when the user asks to build, implement or execute a plan file. Not for tasks without a plan (use the plan skill first).
+description: Execute an approved plan from docs/plans/ wave by wave with the worker agents, verifying each wave. Use when asked to build or implement a plan file.
 argument-hint: <plan path, e.g. docs/plans/foo.md>
 ---
 
@@ -19,8 +19,8 @@ Each task has a `Status:` line. You are the only one who edits it; workers never
 
 ## For each wave, in order
 1. Record the base commit: `BASE=$(git rev-parse HEAD)`.
-2. Launch every task of the wave in parallel, one agent per task, with the worker named in the plan (`java-developer`, `python-developer`, `node-developer`, `frontend-developer`, `database-engineer`). Prompt = the plan path and the task id, plus this line: "Other workers are editing other files at the same time; judge your checks by your own files, ignore errors in files outside your task's `Owns` and list them in Notes." Workers read the rest from disk. Do not use worktrees for this: a fresh worktree has no installed dependencies and merging adds cost; the disjoint `Owns` rule is what keeps parallel workers apart, and your wave-level check is the real gate.
-3. Collect the reports (each is `Task: <id> – done | partial | blocked`). Keep only the status line and any notes in your context. Mark `done` tasks `[~] built`.
+2. Launch every task of the wave in parallel, one agent per task, with the worker named in the plan (`java-developer`, `python-developer`, `node-developer`, `frontend-developer`, `database-engineer`). Prompt = the plan path and the task id, plus this line: "Other workers are editing other files at the same time; judge your checks by your own files, ignore errors in files outside your task's `Owns` and list them in Notes." Workers read only the plan's Goal, Architecture (with the contract) and their own task from disk, and stage and commit only their own files. Do not use worktrees for this: a fresh worktree has no installed dependencies and merging adds cost; the disjoint `Owns` rule is what keeps parallel workers apart, and your wave-level check is the real gate.
+3. Collect the reports (each is `Task: <id> – done | partial | blocked`, plus a `STOP: <code>: <reason>` line when not done and a final `REPORT_JSON:` line). Keep only the status line, the STOP line and any notes in your context. Mark `done` tasks `[~] built`.
 4. If any task is `partial` or `blocked`, mark it `[!] blocked: <note>` in the plan, stop and show me the notes. Do not start the next wave.
 5. Use the `verify` skill with range `$BASE..HEAD` and the plan path for this wave. When it passes, mark the wave's tasks `[x] verified` and commit the plan file (`docs(plan): wave N verified`). Do not start the next wave until then. Append every minor finding and worker caveat from the wave to the plan's `## Follow-ups` section, one line each (id, file, problem), and include it in the same commit.
 

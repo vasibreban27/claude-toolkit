@@ -1,6 +1,6 @@
 ---
 name: review
-description: Read-only review of code changes by the reviewer agent; reports findings and fixes nothing. Use when the user asks for a review, a second opinion or a look at their diff, branch or PR before merging.
+description: Read-only review of a diff, branch or PR by the reviewer agent; fixes nothing.
 argument-hint: <range, default: current branch vs main>
 ---
 

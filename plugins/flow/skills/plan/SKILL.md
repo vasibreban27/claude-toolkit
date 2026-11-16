@@ -1,6 +1,6 @@
 ---
 name: plan
-description: Lead role. Brainstorm a task with the user, agree on an approach, then write a plan in docs/plans/ that splits the work into tasks for the worker agents. Use when the user wants to plan, design or brainstorm a feature or change before building it.
+description: Brainstorm a task with the user, agree an approach, then write a task-split plan in docs/plans/. Use to plan or design a change before building it.
 argument-hint: <task description>
 model: opus
 ---
