@@ -6,7 +6,7 @@ Three layers, each with one job:
 
 | Layer | What it is | Runs where | Cost |
 |---|---|---|---|
-| **Skills** (`plan`, `build`, `verify`, `review`, `debug`, `pr`) | Procedures. Claude loads one when your prompt matches its description, or you type `/flow:<name>`. | Your main conversation | Only the loaded skill's text |
+| **Skills** (`plan`, `build`, `verify`, `review`, `debug`, `status`, `pr`) | Procedures. Claude loads one when your prompt matches its description, or you type `/flow:<name>`. | Your main conversation | Only the loaded skill's text |
 | **Agents** (4 workers, `reviewer`, `test-writer`, `security-auditor`) | Specialists in their own clean context. They return one short report. | Isolated subagents | Their own tokens; your context only sees the report |
 | **Hooks** (`hooks/guard.js`) | Rules enforced by code, not by asking nicely. | Before every tool call, in main thread and subagents | Zero tokens |
 
@@ -31,10 +31,11 @@ Look:     review   (read-only, fixes nothing)
    - runs `verify` on the wave's commits before starting the next wave,
    - ticks `Status:` in the plan: `[ ] todo` → `[~] built` → `[x] verified`, or `[!] blocked`.
 4. **`verify`** (per wave): compile/lint/tests first; then `reviewer` (always) and `security-auditor` (only if the diff touches auth, input handling, query building, secrets or uploads) in parallel; `test-writer` fills gaps once (round 1 only); the matching worker fixes each finding and adds its regression test; re-review only what changed. Max 3 rounds, then it asks you.
-5. **"Open a PR"** → `/flow:pr`. This one is explicit-only, because it pushes.
+5. **"Open a PR"** → `/flow:pr`. This one is explicit-only, because it pushes. It stops on main/master, runs the full tests first and warns if plan tasks are not verified.
 
 ### Stopping and resuming
-The plan file is the memory. Close the session whenever; later say "continue building docs/plans/<slug>.md". `build` skips `[x]` tasks, verifies waves that are all `[~]`, and re-dispatches `[ ]`/`[!]` tasks.
+The plan file is the memory. Say "status" (or `/flow:status`) to see which tasks are done, built, blocked or todo and what the next step is.
+Before each wave `build` refuses to launch tasks whose `Owns` overlap, and after it checks that no worker changed files outside its `Owns`. Close the session whenever; later say "continue building docs/plans/<slug>.md". `build` skips `[x]` tasks, verifies waves that are all `[~]`, and re-dispatches `[ ]`/`[!]` tasks.
 
 ### Bug path
 "Users get a 500 when the cart is empty" → `debug`: reproduce → ranked hypotheses → smallest fix → regression test → verify only if the fix was bigger than one file. No plan file, no workers.

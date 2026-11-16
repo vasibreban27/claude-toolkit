@@ -20,7 +20,8 @@ one explicitly as `/flow:<name>`.
 | `verify` | Review, fill test gaps, fix findings (bounded loop) | yes |
 | `review` | Read-only review, no fixes | yes |
 | `debug` | Bug path: reproduce, smallest fix, regression test | yes |
-| `pr` | Commit, push, open a PR | no (explicit only) |
+| `status` | Where a plan stands: tasks per wave, blockers, next step (read-only) | yes |
+| `pr` | Commit, push, open a PR (refuses on main, needs passing tests) | no (explicit only) |
 
 Agents: `java-developer`, `python-developer`, `node-developer`, `frontend-developer`, `database-engineer` (workers),
 `reviewer` (sonnet, read-only), `test-writer`, `security-auditor` (opus for auth/crypto/secrets/payments, sonnet otherwise; read-only, conditional).
