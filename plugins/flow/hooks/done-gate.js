@@ -116,5 +116,5 @@ if (require.main === module) {
       process.stderr.write("flow done-gate: " + e.message + "\n");
     } catch (_) {}
   }
-  process.exit(0);
+  process.exitCode = 0; // not process.exit(): lets the stdout write finish on every platform
 }

@@ -40,7 +40,7 @@ Keep the HEAD sha at the start of each round.
    | Angular or React files (`.ts`, `.tsx`, `.html`, `.scss` in the UI app / renderer) | `frontend-developer` |
    | anything else | you fix it in the main thread; do not spawn an agent |
 
-   When delegating, pass the finding in full (id, file:line, problem, scenario, suggested fix, failing test output). Say explicitly: this is a fix assignment, the finding is the task, the files named in the finding are the files it owns (overriding the plan's `Owns`), use the finding id where a task id is expected, and add a regression test for the finding (unless one exists). Findings in different files go out in parallel; findings in the same file go to one worker together.
+   When delegating, use the contents of `${CLAUDE_PLUGIN_ROOT}/prompts/worker-fix.md` with `{{plan_path}}`, `{{finding_id}}` and `{{finding}}` filled in (the finding in full: id, file:line, problem, scenario, suggested fix, failing test output); add nothing else (`docs/prompts.md`). If the file cannot be found, say explicitly: this is a fix assignment, the finding is the task, the files named in the finding are the files it owns (overriding the plan's `Owns`), use the finding id where a task id is expected, and add a regression test for the finding (unless one exists). Findings in different files go out in parallel; findings in the same file go to one worker together (use the first id as `{{finding_id}}` and list all findings in `{{finding}}`).
    **Minor findings are not fixed in the loop**: collect them (id, file, problem, one line each) and return them to the caller for `## Follow-ups`.
 4. Run step 0 again, then round 2 (if round 1 had open findings). After round 2 the loop ends.
 

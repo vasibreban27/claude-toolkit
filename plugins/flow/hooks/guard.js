@@ -7,10 +7,20 @@
 const fs = require("fs");
 const path = require("path");
 
-const SAFE_ENV_SUFFIX = /\.(example|sample|template|dist|defaults?)$/i;
+// The path lists live in protected-paths.json (shared with the claude-desk app guard); the matching logic stays here.
+// A missing or broken file crashes this script on load (a visible hook error, never a silent loss of protection).
+const PP = require("./protected-paths.json");
+const alt = (list) => list.map((s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|");
+const SAFE_ENV_SUFFIX = new RegExp(`\\.(${alt(PP.secrets.envSafeSuffixes)})$`, "i");
+const KEY_EXT = new RegExp(`\\.(${alt(PP.secrets.keyExtensions)})$`);
+const SSH_KEYS = new Set(PP.secrets.sshKeyNames);
+const AWS_CREDENTIALS = new RegExp(`(^|/)${alt([PP.secrets.awsCredentialsPath])}$`);
+const SECRET_NAME_DATA = new RegExp(`^(${alt(PP.secrets.names)})\\.(${"json|ya?ml|toml|ini|txt|env|properties|conf|cfg|xml"})$`);
+const SECRET_NAME_BARE = new RegExp(`^(${alt(PP.secrets.names)})$`);
+const SECRET_DIR = new RegExp(`(^|/)(${alt(PP.secrets.dirs)})/`);
+const PROD_CONFIG = new RegExp(`^application-(${alt(PP.secrets.productionConfigEnvs)})\\.(ya?ml|properties)$`);
 // Source files that merely live in a folder or carry a name like "secrets": never secret material themselves.
 const SOURCE_EXT = /\.(ts|tsx|mts|cts|js|jsx|mjs|cjs|java|kt|kts|scala|groovy|py|go|rs|cs|rb|php|swift|c|cc|cpp|h|hpp|md|html|css|scss|vue|svelte)$/;
-const DATA_EXT = "json|ya?ml|toml|ini|txt|env|properties|conf|cfg|xml";
 
 // A path/token that points at a secret file. opts.shell = the token comes from a command line, where a
 // bare word such as "credentials" or "secrets" is ordinary text (a search term, a commit message), not a file.
@@ -18,17 +28,17 @@ function isSecretPath(raw, opts = {}) {
   const p = String(raw).replace(/\\/g, "/").toLowerCase();
   const base = p.split("/").pop();
   if (/^\.env([.*?].*)?$/.test(base) && !SAFE_ENV_SUFFIX.test(base)) return ".env file";
-  if (/\.(pem|key|p12|pfx|jks|keystore)$/.test(base)) return "key/certificate file";
-  if (/^id_(rsa|dsa|ecdsa|ed25519)$/.test(base)) return "SSH private key";
-  if (/(^|\/)\.aws\/credentials$/.test(p)) return "credentials file";
-  if (new RegExp(`^(credentials|secrets?)\\.(${DATA_EXT})$`).test(base)) return "secrets file";
-  if (!opts.shell && /^(credentials|secrets?)$/.test(base)) return "secrets file";
-  if (/(^|\/)secrets?\//.test(p) && !SOURCE_EXT.test(base)) {
+  if (KEY_EXT.test(base)) return "key/certificate file";
+  if (SSH_KEYS.has(base)) return "SSH private key";
+  if (AWS_CREDENTIALS.test(p)) return "credentials file";
+  if (SECRET_NAME_DATA.test(base)) return "secrets file";
+  if (!opts.shell && SECRET_NAME_BARE.test(base)) return "secrets file";
+  if (SECRET_DIR.test(p) && !SOURCE_EXT.test(base)) {
     // "secrets/" with no file after it is a directory listing in a shell command; a content search into it is not.
     if (base === "" && opts.shell) return null;
     return "secrets file";
   }
-  if (/^application-(prod|production)\.(ya?ml|properties)$/.test(base)) return "production config";
+  if (PROD_CONFIG.test(base)) return "production config";
   return null;
 }
 
@@ -164,11 +174,11 @@ function deleteReason(seg) {
 
 // ---- Rule: noise directories (token savers) -------------------------------------------------
 // Dependencies, build output and VCS internals are never worth reading. Disable with FLOW_ALLOW_NOISE=1.
-const NOISE_ANYWHERE = new Set(["node_modules", ".git", ".venv", "venv", "__pycache__", ".angular", ".next", ".gradle", ".idea"]);
+const NOISE_ANYWHERE = new Set(PP.noise.anywhere);
 // These names are also legitimate package/folder names inside source trees (src/build/), so they only count
 // at the top of the project, or when the folder next to them is a project (has package.json, pom.xml, ...).
-const NOISE_PROJECT_LEVEL = new Set(["target", "dist", "build", "out", "coverage"]);
-const PROJECT_MARKERS = ["package.json", "pom.xml", "build.gradle", "build.gradle.kts", "settings.gradle", "settings.gradle.kts", "Cargo.toml", "pyproject.toml", "setup.py", "go.mod", "CMakeLists.txt", "angular.json"];
+const NOISE_PROJECT_LEVEL = new Set(PP.noise.projectLevel);
+const PROJECT_MARKERS = PP.noise.projectMarkers;
 
 function isProjectDir(dir) {
   try {
@@ -197,13 +207,14 @@ function noiseReason(p, cwd) {
     if (NOISE_PROJECT_LEVEL.has(segs[i]) && (i === 0 || (dir && isProjectDir(path.join(dir, ...segs.slice(0, i)))))) return segs[i];
   }
   const base = (segs[segs.length - 1] || "").toLowerCase();
-  if (/\.min\.(js|css)$/.test(base) || /\.map$/.test(base)) return "minified/sourcemap file";
+  if (PP.noise.fileSuffixes.some((s) => base.endsWith(s))) return "minified/sourcemap file";
   return null;
 }
 
 // ---- Rule: protected paths (no direct writes) ------------------------------------------------
 // Disable with FLOW_ALLOW_PROTECTED=1.
-const LOCKFILES = /^(package-lock\.json|npm-shrinkwrap\.json|yarn\.lock|pnpm-lock\.yaml|poetry\.lock|uv\.lock|pipfile\.lock|composer\.lock|cargo\.lock|gradle\.lockfile)$/i;
+const LOCKFILES = new Set(PP.noWrite.lockfiles);
+const GENERATED_DIR = new RegExp(`(^|/)(${alt(PP.noWrite.generatedDirs)})/`, "i");
 
 function isMigrationPath(p) {
   const n = String(p).replace(/\\/g, "/");
@@ -243,8 +254,8 @@ function existsOnMain(absPath, cwd) {
 function protectedReason(p, cwd) {
   const n = String(p).replace(/\\/g, "/");
   const base = n.split("/").pop();
-  if (LOCKFILES.test(base)) return `lockfile ${base} is changed by the package manager (npm/pnpm/yarn/poetry/uv...), never by hand. Run the install/update command instead.`;
-  if (/(^|\/)(generated|generated-sources|__generated__)\//i.test(n) || /\.generated\./i.test(base))
+  if (LOCKFILES.has(base.toLowerCase())) return `lockfile ${base} is changed by the package manager (npm/pnpm/yarn/poetry/uv...), never by hand. Run the install/update command instead.`;
+  if (GENERATED_DIR.test(n) || base.toLowerCase().includes(PP.noWrite.generatedInfix))
     return `${base} is generated code. Change the generator input (OpenAPI spec, schema, template) and regenerate.`;
   if (isMigrationPath(n) && existsOnMain(p, cwd))
     return `${base} is an applied migration (it already exists on main). Never edit it: its checksum is recorded. Add a new migration instead.`;
@@ -294,7 +305,76 @@ function shellReason(cmd, cwd, inSubagent, depth = 0) {
   return null;
 }
 
-module.exports = { isSecretPath, noiseReason, shellReason, segmentsOf };
+// ---- Allow-list (fewer permission prompts) ---------------------------------------------------
+// After every block rule has passed, a command may be auto-approved ("allow") when it is exactly known safe:
+//  1. read-only git (status, diff, log, show, ...) with plain arguments, or
+//  2. a test/lint/typecheck command that CLAUDE.md lists, matched exactly (no extra arguments).
+// Only simple commands qualify: the whole command must be plain words, spaces and a few path characters, so
+// `&&`, `;`, `|`, redirects, quotes, `$(...)`, backticks, globs and newlines never match (`npm test && curl evil` fails).
+// Claude Code still applies the user's deny/ask rules after this hook. Disable with FLOW_ALLOWLIST=off.
+// Trust note: a listed command like `npm test` runs the project's own scripts, so this assumes you already trust the repo.
+const SAFE_CMD = /^[\w@%+=:,.\/\\~^{} -]+$/;
+const READONLY_GIT = new Set(["status", "diff", "log", "show", "rev-parse", "rev-list", "merge-base", "ls-files", "ls-tree", "cat-file", "describe", "blame", "shortlog", "name-rev", "show-ref", "diff-tree", "diff-index"]);
+const GIT_DANGEROUS_ARG = /^(--output|-o$|--no-index|--ext-diff|--textconv|--open-files-in-pager|--upload-pack|--exec)/;
+const RUNNER = /^(npm|pnpm|yarn|npx|bun|node|mvn|mvnw|\.[\\/]mvnw|gradle|gradlew|\.[\\/]gradlew|pytest|python|python3|py|uv|poetry|tox|nox|cargo|go|dotnet|make|tsc|eslint|ruff|mypy|vitest|jest|mocha|ng)$/;
+const TESTISH = /^(--)?(test|tests|test:[\w:-]+|lint|lint:[\w:-]+|typecheck|type-check|check|tsc|pytest|vitest|jest|mocha|eslint|ruff|mypy|verify)$/;
+const FORBIDDEN = /^(install|i|ci|add|remove|rm|publish|deploy|push|release|exec|dlx|x|create|init|update|upgrade|uninstall|login)$/;
+
+function readOnlyGit(tokens) {
+  if (tokens[0] !== "git" || tokens.length < 2) return false;
+  const sub = tokens[1];
+  const args = tokens.slice(2);
+  if (sub.startsWith("-")) return false; // global options (-c, -C, --git-dir) can change what runs
+  if (args.some((a) => GIT_DANGEROUS_ARG.test(a))) return false;
+  // `git show HEAD:.env` prints a secret out of history: never auto-approve a secret path behind a revision.
+  if (args.some((a) => a.includes(":") && a.split(":").some((part) => isSecretPath(part)))) return false;
+  if (READONLY_GIT.has(sub)) return true;
+  if (sub === "branch") return args.every((a) => ["--show-current", "-a", "-r", "-v", "-vv", "--list"].includes(a));
+  if (sub === "tag") return args.length === 0 || (args.length === 1 && (args[0] === "-l" || args[0] === "--list"));
+  if (sub === "remote") return args.length === 0 || (args.length === 1 && args[0] === "-v");
+  if (sub === "stash") return args[0] === "list" || args[0] === "show";
+  return false;
+}
+
+// Test/lint/typecheck commands written in CLAUDE.md (inline `code` or fenced blocks), as exact strings.
+function commandsFromClaudeMd(md) {
+  const out = new Set();
+  const add = (s) => {
+    const c = s.replace(/^\s*(\$|>|PS>)\s+/, "").trim().replace(/ +/g, " ");
+    if (!c || !SAFE_CMD.test(c)) return;
+    const t = c.split(" ");
+    if (!RUNNER.test(t[0]) || t.some((x) => FORBIDDEN.test(x)) || !t.some((x) => TESTISH.test(x))) return;
+    out.add(c);
+  };
+  let fenced = false;
+  for (const line of String(md).split(/\r?\n/)) {
+    if (/^\s*```/.test(line)) {
+      fenced = !fenced;
+      continue;
+    }
+    if (fenced) add(line);
+    else for (const m of line.matchAll(/`([^`]+)`/g)) add(m[1]);
+  }
+  return out;
+}
+
+// Returns why the command may be auto-approved, or null (then Claude Code's normal permission flow applies).
+function allowReason(cmd, cwd) {
+  if (process.env.FLOW_ALLOWLIST === "off") return null;
+  const raw = String(cmd).trim();
+  if (!raw || !SAFE_CMD.test(raw)) return null; // tabs, newlines, quotes and shell operators all fail here
+  const c = raw.replace(/ +/g, " ");
+  if (readOnlyGit(c.split(" "))) return "read-only git";
+  const dirs = [...new Set([cwd, process.env.CLAUDE_PROJECT_DIR].filter(Boolean))];
+  for (const d of dirs) {
+    try {
+      if (commandsFromClaudeMd(fs.readFileSync(path.join(d, "CLAUDE.md"), "utf8")).has(c)) return "test/lint/typecheck command listed in CLAUDE.md";
+    } catch {}
+  }
+  return null;
+}
+
+module.exports = { isSecretPath, noiseReason, shellReason, segmentsOf, allowReason, commandsFromClaudeMd };
 
 if (require.main === module) {
   let raw = "";
@@ -347,6 +427,13 @@ if (require.main === module) {
       if (/^(Bash|PowerShell)$/.test(tool) && typeof ti.command === "string") {
         const why = shellReason(ti.command, cwd, inSubagent);
         if (why) block(why);
+        // 3. Nothing blocked it: auto-approve exactly known safe commands (see the allow-list above).
+        const ok = allowReason(ti.command, cwd);
+        if (ok) {
+          const out = JSON.stringify({ hookSpecificOutput: { hookEventName: "PreToolUse", permissionDecision: "allow", permissionDecisionReason: `flow allow-list: ${ok}` } });
+          process.stdout.write(out, () => process.exit(0));
+          return;
+        }
       }
     } catch {
       process.exit(0);
