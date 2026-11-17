@@ -89,4 +89,4 @@ try {
     process.stderr.write("flow timing: " + e.message + "\n");
   } catch (_) {}
 }
-process.exit(0);
+process.exitCode = 0;
