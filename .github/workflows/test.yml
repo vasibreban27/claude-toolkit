@@ -19,4 +19,4 @@ jobs:
           git config --global user.email ci@example.com
           git config --global user.name ci
       - name: Hook and plan-lint tests
-        run: node --test plugins/flow/hooks/guard.test.js plugins/flow/hooks/done-gate.test.js plugins/flow/hooks/timing.test.js plugins/flow/bin/plan-lint.test.js
+        run: node --test plugins/flow/hooks/guard.test.js plugins/flow/hooks/guard-allow.test.js plugins/flow/hooks/done-gate.test.js plugins/flow/hooks/timing.test.js plugins/flow/hooks/session-start.test.js plugins/flow/hooks/optional-hooks.test.js plugins/flow/hooks/shared.test.js plugins/flow/bin/plan-lint.test.js
