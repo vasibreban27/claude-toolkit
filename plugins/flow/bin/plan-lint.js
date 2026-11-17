@@ -179,7 +179,7 @@ function lint(text) {
   return { errors, tasks: plan.tasks.length, waves: plan.waves.length };
 }
 
-module.exports = { lint, FORMAT };
+module.exports = { lint, parse, FORMAT };
 
 if (require.main === module) {
   const file = process.argv[2];
