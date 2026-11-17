@@ -30,6 +30,6 @@ Covers: <bullets>
 Tests: <command> → <result>
 Production bugs found: <file:line – problem, or none>
 
-If you cannot finish (framework not found, tests cannot run), start the report with a line `STOP: <code>: <reason>` with a code from: `env-failure`, `needs-decision`.
+If you cannot finish (framework not found, tests cannot run), start the report with a line `STOP: <code>: <reason>` with a code from: `blocked`, `decision`.
 The last line is a one-line JSON footer for the app, nothing after it:
 `REPORT_JSON: {"tests_added":3,"production_bugs":0,"stop":null}`
