@@ -23,14 +23,15 @@ Look:     review   (read-only, fixes nothing)
 
 ### Feature path, step by step
 
-1. **Say what you want**: "plan a cancel-order endpoint". The `plan` skill (opus) reads `CLAUDE.md` and the relevant code, asks at most 3 questions at a time, proposes 2-3 approaches, and waits for your pick.
+1. **Say what you want**: "plan a cancel-order endpoint". The `plan` skill (opus) reads `CLAUDE.md` and the relevant code, proposes 2-3 approaches and asks at most 3 questions in one round, each with a recommended answer (reply `accept all recommended` to take them all). It reads the repo once and writes `Read first:` per task, then runs `plan-lint` before showing you the plan.
 2. **Review the plan file** `docs/plans/<slug>.md`: Goal (story + outcomes), Scope, Architecture (with the API contract), Risks, Test strategy, Tasks in waves. This is the only moment where your attention is cheap. Edit the file by hand if something is off.
 3. **"Build docs/plans/<slug>.md"**. The `build` skill:
    - launches each wave's tasks in parallel, one worker per task (prompt = plan path + task id),
    - collects short reports (`Task: T3 – done | partial | blocked`),
    - runs `verify` on the wave's commits before starting the next wave,
-   - ticks `Status:` in the plan: `[ ] todo` → `[~] built` → `[x] verified`, or `[!] blocked`.
-4. **`verify`** (per wave): compile/lint/tests first; then `reviewer` (always) and `security-auditor` (only if the diff touches auth, input handling, query building, secrets or uploads) in parallel; `test-writer` fills gaps once (round 1 only); the matching worker fixes each finding and adds its regression test; re-review only what changed. Max 3 rounds, then it asks you.
+   - ticks `Status:` in the plan: `[ ] todo` → `[~] built` → `[x] verified`, or `[!] blocked`,
+   - stops only at **gates** (table in `skills/build/SKILL.md`): plan approval, a design decision, a source file outside `Owns`, anything irreversible, a task blocked after one retry, a cost or time cap. How often it also pauses between waves is the **autonomy** setting: `supervised` (every wave), `checkpoints` (default: after waves with a sensitive task), `autonomous` (gates only). Set it with an `Autonomy:` line in the plan, a `flow-autonomy: <value>` line in `CLAUDE.md`, or in the build prompt.
+4. **`verify`** (per wave, scaled by the plan's `Sensitive:` field): a non-sensitive wave gets compile/lint/tests only. A sensitive wave also gets the `reviewer` and, in parallel, the `security-auditor` (delta-only, reads `docs/threat-model.md`). `test-writer` runs only for tasks marked `Tests: writer` or a finding that needs coverage. The matching worker fixes each blocker and major finding and adds its regression test. Max 2 rounds, then it asks you; minor findings go to the plan's Follow-ups. After the last wave, one reviewer pass over the whole branch covers any wave that skipped it.
 5. **"Open a PR"** → `/flow:pr`. This one is explicit-only, because it pushes. It stops on main/master, runs the full tests first and warns if plan tasks are not verified.
 
 ### Stopping and resuming
@@ -50,7 +51,10 @@ Before each wave `build` refuses to launch tasks whose `Owns` overlap, and after
 |---|---|
 | Different stack guidance | `agents/<worker>.md` (the "what commonly goes wrong" section) |
 | Stricter or looser reviews | `agents/reviewer.md` (checks, severity rules) |
-| When security runs | `skills/verify/SKILL.md` (the Security paragraph) |
+| When security runs | `Sensitive:` per task in the plan; fallback surface check in `skills/verify/SKILL.md` (the Security paragraph) |
+| What the auditor treats as in scope | `docs/threat-model.md` in the project (template: `docs/threat-model.template.md`) |
+| When build pauses | `Autonomy:` in the plan, `flow-autonomy:` in `CLAUDE.md`, or the gate table in `skills/build/SKILL.md` |
+| The plan format | `docs/plan-format.md` + `plugins/flow/bin/plan-lint.js`; changing it means bumping `flow-plan/N` and the claude-desk parser |
 | A skill must not auto-trigger | add `disable-model-invocation: true` to its frontmatter |
 | Cheaper/faster agents | `model:` in the agent's frontmatter (`sonnet`, `haiku`, `opus`) |
 | Project conventions | your project's `CLAUDE.md`; every agent reads it first and it beats the agent files |
@@ -72,9 +76,9 @@ Escape hatches, for the rare case you really want it: set `FLOW_ALLOW_NOISE=1` o
 
 Bare words such as "credentials" or "secrets" in a search or commit message are fine, and so are source files like `secrets/store.ts`; only data/config files (`secrets.json`, `credentials.yml`, `secrets/db.txt`) are blocked.
 
-Tests: `node --test plugins/flow/hooks/guard.test.js`. Add a case to the table there with every rule you add.
+Tests: `node --test plugins/flow/hooks/*.test.js plugins/flow/bin/*.test.js`. Add a case to the table there with every rule you add.
 
-Agent reports end with a one-line `REPORT_JSON: {...}` footer, and a `STOP: <code>: <reason>` line when the agent cannot finish, so the app can parse them. Agents have a `maxTurns` cap in their frontmatter (Claude Code returns the output marked partial when it is hit).
+Agent reports end with a one-line `REPORT_JSON: {...}` footer, and a `STOP: <code>: <reason>` line when the agent cannot finish, so the app can parse them. STOP codes are `blocked`, `scope`, `decision` and `limit` (see `skills/build/SKILL.md`); `done-gate.js` checks the report format when an agent stops and sends a malformed report back once (it never loops: it honors `stop_hook_active`). `timing.js` logs agent time to `.flow/timing.jsonl`. Both hooks fail open, unlike `guard.js`; set `FLOW_DONE_GATE=off` or `FLOW_TIMING=off` to disable them. Agents have a `maxTurns` cap in their frontmatter (Claude Code returns the output marked partial when it is hit).
 
 Add a rule: add a line in `guard.js` with a regex and a `block("reason")`. Test it by piping a sample, e.g.
 `echo '{"tool_name":"Bash","tool_input":{"command":"cat .env"}}' | node plugins/flow/hooks/guard.js; echo $?` → prints the reason and `2`.

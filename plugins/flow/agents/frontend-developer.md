@@ -47,6 +47,6 @@ Tests: <command> → <result>
 Acceptance criteria: <each one → met / not met>
 Notes & assumptions: <bullets>
 
-If the task is `partial` or `blocked`, put a line `STOP: <code>: <reason>` right after the `Task:` line, with a code from: `outside-owns` (needs a file you do not own), `contract-mismatch`, `needs-decision`, `env-failure` (build/DB/tools broken), `tests-failing`.
+If the task is `partial` or `blocked`, put a line `STOP: <code>: <reason>` right after the `Task:` line, with a code from: `scope` (needs a source file you do not own), `decision` (contract mismatch, or a choice the plan does not cover), `blocked` (build, DB or tools broken, or tests keep failing). `STOP` codes are defined in the `build` skill.
 The last line is a one-line JSON footer for the app, nothing after it:
 `REPORT_JSON: {"task":"T3","status":"done","files":["a.java"],"tests":"pass|fail|none","stop":null}` (`stop` is the STOP code or null).

@@ -10,6 +10,32 @@
           }
         ]
       }
+    ],
+    "SubagentStart": [
+      {
+        "matcher": "^(flow:)?(java-developer|python-developer|node-developer|frontend-developer|database-engineer|reviewer|security-auditor|test-writer)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/timing.js\""
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "^(flow:)?(java-developer|python-developer|node-developer|frontend-developer|database-engineer|reviewer|security-auditor|test-writer)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/done-gate.js\""
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/timing.js\""
+          }
+        ]
+      }
     ]
   }
 }
