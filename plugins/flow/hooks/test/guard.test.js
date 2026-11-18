@@ -6,7 +6,7 @@ const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
 
-const GUARD = path.join(__dirname, "guard.js");
+const GUARD = path.join(__dirname, "..", "guard.js");
 let proj; // temp project on branch "main", with a Node module "web/" and a source folder "src/build/"
 
 before(() => {

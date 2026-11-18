@@ -94,6 +94,13 @@ test("more than 8 tasks", () => {
   has(text, /10 tasks; at most 8/);
 });
 
+test("more than 5 acceptance criteria per task", () => {
+  const anchor = "  - Given a foreign order When POST cancel Then 403\n";
+  const bullets = (n) => Array.from({ length: n }, (_, i) => `  - Given x${i} When y Then z\n`).join("");
+  has(VALID.replace(anchor, anchor + bullets(3)), /6 acceptance criteria; at most 5/);
+  assert.deepStrictEqual(msgs(VALID.replace(anchor, anchor + bullets(2))), []);
+});
+
 test("Done when needs a backticked command", () => {
   has(VALID.replace("`mvn -q test -Dtest=Order*`", "tests pass"), /Done when must contain/);
 });

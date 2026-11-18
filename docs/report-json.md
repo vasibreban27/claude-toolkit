@@ -13,6 +13,7 @@ Version: the footer has no version field. A change to the keys below is a toolki
 | `scope` | needs a source file outside `Owns` | yes |
 | `decision` | contract mismatch, or a choice the plan does not cover | yes |
 | `limit` | round limit, cost cap or time cap reached (raised by the orchestrator) | yes |
+| `slow-tests` | the fast suite took over 60 s in `verify` (raised by the orchestrator, advisory: suggests splitting slow tests out) | no |
 
 ## Workers (`java-developer`, `python-developer`, `node-developer`, `frontend-developer`, `database-engineer`)
 Text: a line `Task: <id> – done | partial | blocked`, then a `STOP:` line when not done.
@@ -50,4 +51,4 @@ REPORT_JSON: {"tests_added":3,"production_bugs":0,"stop":null}
 | `production_bugs` | integer | real bugs the new tests exposed |
 | `stop` | string \| null | `blocked` or `decision` when it could not finish |
 
-The examples above are checked against `done-gate.js` by `plugins/flow/hooks/shared.test.js`.
+The examples above are checked against `done-gate.js` by `plugins/flow/hooks/test/shared.test.js`.

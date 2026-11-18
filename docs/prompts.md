@@ -8,7 +8,7 @@ The prompts that start a worker live in the toolkit, in `plugins/flow/prompts/`,
 | `worker-fix.md` | `verify`, one per finding (or group of findings in one file) | `{{finding_id}}`, `{{finding}}`, `{{plan_path}}` |
 
 ## Rules
-- Placeholders are exactly `{{name}}` with lowercase letters and underscores. Replace every occurrence with a plain string, with no escaping and no other templating. A placeholder that is not in the table above is a bug (`hooks/shared.test.js` checks this).
+- Placeholders are exactly `{{name}}` with lowercase letters and underscores. Replace every occurrence with a plain string, with no escaping and no other templating. A placeholder that is not in the table above is a bug (`hooks/test/shared.test.js` checks this).
 - The file is the whole prompt. Nothing is prepended or appended by the caller; the worker agent's own file (`plugins/flow/agents/<worker>.md`) supplies the stack rules and the report format.
 - The app resolves the files relative to the installed plugin root (`${CLAUDE_PLUGIN_ROOT}/prompts/`) or, in this repo, `plugins/flow/prompts/`.
 - A change to a template or its placeholders is a toolkit change: bump the plugin version and tell the app.

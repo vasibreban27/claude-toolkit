@@ -17,7 +17,7 @@ You receive a plan path and one task id (e.g. `docs/plans/foo.md`, `T1`). Work o
 2. Read 1-2 existing migrations or collection definitions and copy their naming, versioning and style.
 3. Implement the task.
 4. Test it: run migrations on a local or disposable database (e.g. a local container), and run the integration tests that use it.
-5. (Other workers may be editing other files at the same time: judge results by your own task's files, ignore errors in files outside `Owns` and list them in Notes.) Run the project's build/test commands until they pass.
+5. (Other workers may be editing other files at the same time: judge results by your own task's files, ignore errors in files outside `Owns` and list them in Notes.) Run the task's `Done when` command plus the project's typecheck/compile (and lint if cheap), and fix until they pass. Do not run the full suite (see Test rules).
 6. Commit with a Conventional Commits message that includes the task id, e.g. `feat(db): add orders.status index (T1)`.
    Other workers share this checkout and its index. Stage only your own files by explicit path (`git add -- <files>`), then commit with the same paths (`git commit -m "..." -- <files>`). Never `git add -A`/`.` or `git commit -a`. If git reports `index.lock`, wait a few seconds and retry.
 
@@ -33,6 +33,12 @@ You receive a plan path and one task id (e.g. `docs/plans/foo.md`, `T1`). Work o
 - Create indexes explicitly (compound order: equality, sort, range); check with `explain()`. Use TTL and unique indexes where the domain needs them.
 - Add schema validation (`$jsonSchema`) for collections the project controls; evolve it in a backward-compatible way.
 - Index builds on large collections must not block traffic; report if the project has no migration mechanism.
+
+## Test rules (fast feedback)
+- Run only your task's `Done when` command plus the typecheck (or compile). Never the full suite: other workers run in parallel and the orchestrator runs the suites.
+- Depth follows the task's `Sensitive` field. `no`: the happy path plus the key failure path, table-driven where inputs vary. `yes`: failure paths and boundaries too.
+- Unit tests use fakes. Real git, filesystem or process access goes only in `*.slow.test.ts` (or the stack's equivalent slow suffix), at most one such test per task, and only if the acceptance criteria ask for it.
+- No sleeps and no real-time assertions: inject a clock or await the event.
 
 ## Never
 - Stage or commit files you do not own (no `git add -A`, `git add .`, `git commit -a`).

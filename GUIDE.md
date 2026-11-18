@@ -65,6 +65,7 @@ Before each wave `build` refuses to launch tasks whose `Owns` overlap, and after
 | The plan format | `docs/plan-format.md` + `plugins/flow/bin/plan-lint.js`; changing it means bumping `flow-plan/N` and the claude-desk parser |
 | A skill must not auto-trigger | add `disable-model-invocation: true` to its frontmatter |
 | Cheaper/faster agents | `model:` in the agent's frontmatter (`sonnet`, `haiku`, `opus`) |
+| Test speed | `Test (fast)`, `Test (changed)`, `Test (slow)` lines in your project's `CLAUDE.md`; worker test rules in `agents/<worker>.md` ("Test rules"); slow tests go in `*.slow.test.ts` |
 | Project conventions | your project's `CLAUDE.md`; every agent reads it first and it beats the agent files |
 
 ## Hooks: rules that always apply
@@ -88,7 +89,7 @@ Escape hatches, for the rare case you really want it: set `FLOW_ALLOW_NOISE=1` o
 
 Bare words such as "credentials" or "secrets" in a search or commit message are fine, and so are source files like `secrets/store.ts`; only data/config files (`secrets.json`, `credentials.yml`, `secrets/db.txt`) are blocked.
 
-Tests: `node --test plugins/flow/hooks/*.test.js plugins/flow/bin/*.test.js`. Add a case to the table there with every rule you add.
+Tests: `node --test plugins/flow/hooks/test/*.test.js plugins/flow/bin/*.test.js`. Add a case to the table there with every rule you add.
 
 Agent reports end with a one-line `REPORT_JSON: {...}` footer, and a `STOP: <code>: <reason>` line when the agent cannot finish, so the app can parse them. STOP codes are `blocked`, `scope`, `decision` and `limit` (see `skills/build/SKILL.md`); `done-gate.js` checks the report format when an agent stops and sends a malformed report back once (it never loops: it honors `stop_hook_active`). `timing.js` logs agent time to `.flow/timing.jsonl`. Both hooks fail open, unlike `guard.js`; set `FLOW_DONE_GATE=off` or `FLOW_TIMING=off` to disable them. Agents have a `maxTurns` cap in their frontmatter (Claude Code returns the output marked partial when it is hit).
 

@@ -12,7 +12,7 @@ Task: $ARGUMENTS
 Decision gates (what you ask, what you decide) are defined once in the `build` skill. For planning they mean: ask only for plan approval and for design decisions no default covers.
 
 ## Phase 1: Understand
-1. Read `CLAUDE.md` (project conventions always win over generic guidance). Note a `flow-autonomy:` line if present, and whether `docs/threat-model.md` exists.
+1. Read `CLAUDE.md` (project conventions always win over generic guidance). Note the test commands it declares (`Test (fast)`, `Test (changed)`, `Test (slow)`), if any. Note a `flow-autonomy:` line if present, and whether `docs/threat-model.md` exists.
 2. Explore the relevant code **once**, now: entry points, similar features, the tests next to them, the files each task will change. Keep a list of exact paths per task; it becomes each task's `Read first:` so workers do not explore on their own. Do not scan the whole repo.
 3. Restate the task in 2-3 sentences. Ask only if it is ambiguous.
 
@@ -73,6 +73,7 @@ List every endpoint with method, path, auth, request/response DTO fields and typ
 - Database tasks normally come in an earlier wave than the code that uses them.
 - **Smoke task**: if the plan adds or changes runtime wiring of an app with a UI or shell (preload/IPC, routes, dependency injection, entry points, startup config), end with a final `Smoke` task that launches the app and checks the wiring at runtime. Automate it if cheap; otherwise it writes `docs/notes/<slug>-manual-check.md` with exact steps.
 - With an API contract, backend and frontend tasks can share a wave: both build against the contract.
+- **Fast feedback**: at most 5 acceptance criteria per task, each written as behaviour (Given/When/Then), not implementation. `Done when` is the fast, targeted command (one test file or class, or the project's `Test (changed)`/`Test (fast)` form), never the full or slow suite. Real-git, filesystem or process integration goes in its own small task (its test is a `*.slow.test.ts`), not mixed into a feature task. If a task needs more than 5 criteria, split it.
 - Every acceptance criterion must be checkable by a test or a command. Never write "auditor returns PASS" or any agent verdict as a criterion (it invites an unbounded fix loop); write "No blocker or major findings after at most 2 fix rounds".
 - Tasks name real paths found during exploration, not guesses. `Done when` is one command, not prose.
 

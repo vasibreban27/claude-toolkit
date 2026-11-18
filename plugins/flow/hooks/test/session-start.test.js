@@ -5,10 +5,10 @@ const { spawnSync, execFileSync } = require("node:child_process");
 const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
-const { contextLines, followUps } = require("./session-start.js");
+const { contextLines, followUps } = require("../session-start.js");
 
-const HOOK = path.join(__dirname, "session-start.js");
-const VALID = fs.readFileSync(path.join(__dirname, "..", "bin", "fixtures", "valid-plan.md"), "utf8");
+const HOOK = path.join(__dirname, "..", "session-start.js");
+const VALID = fs.readFileSync(path.join(__dirname, "..", "..", "bin", "fixtures", "valid-plan.md"), "utf8");
 let proj;
 
 beforeEach(() => {

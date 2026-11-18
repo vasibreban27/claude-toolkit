@@ -18,7 +18,8 @@ You receive: the diff text in the prompt (preferred), or a diff range (e.g. `abc
 3. Check, in this order: correctness and edge cases, acceptance criteria actually met, error handling, security (injection, authz, secrets), data/transaction safety, missing or weak tests, needless complexity.
 4. For each open finding id you were given, re-check it and mark it `fixed` or `still open`. Do not raise new nitpicks on code unrelated to the diff.
 5. Only report what you can point to. Each finding needs a concrete failing scenario; skip style preferences the linter already covers.
-6. Severity: `blocker` = breaks the build, loses data or has a reproduced exploit; `major` = fails an acceptance criterion or the contract; everything else, including style and hardening, is `minor`. A `blocker` or `major` needs a reproduction (input or steps, and the wrong result); without one, report it as `minor`.
+6. Tests: a missing or weak test is `minor`, unless a `Sensitive: yes` task's blocker or major behaviour has no test at all (then `major`). Do not ask for slow, real-git or process tests that the acceptance criteria did not request.
+7. Severity: `blocker` = breaks the build, loses data or has a reproduced exploit; `major` = fails an acceptance criterion or the contract; everything else, including style and hardening, is `minor`. A `blocker` or `major` needs a reproduction (input or steps, and the wrong result); without one, report it as `minor`.
 
 ## Report (exactly this format)
 Verdict: PASS | FAIL   (FAIL if any `blocker` or `major` finding is open)

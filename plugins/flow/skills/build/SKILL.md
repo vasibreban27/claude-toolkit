@@ -30,6 +30,7 @@ Every agent report that is not clean carries `STOP: <code>: <reason>` and the sa
 | `scope` | needs a source file outside its `Owns` | yes, at once |
 | `decision` | contract mismatch, or a choice no default or plan text covers | yes, at once |
 | `limit` | raised by you: round limit, cost cap or time cap reached | yes, at once |
+| `slow-tests` | raised by `verify`: the fast suite took over 60 s; advisory, suggest splitting slow tests into `Test (slow)` and put it in Follow-ups | no |
 
 Retry budget: a task that stops with `blocked` is re-dispatched **once**, with the failure output in the prompt. A second `blocked` is a gate. Never retry `scope` or `decision`.
 
@@ -67,7 +68,7 @@ Each task has a `Status:` line. You are the only one who edits it; workers never
 8. **Wave transition**: apply `autonomy` (table above). If it says stop, summarize the wave in 3 lines (tasks, rounds used, findings fixed) and wait. Otherwise start the next wave without asking.
 
 ## Finish
-1. Run the full test suite once.
+1. Run the project's slow suite once: `Test (slow)` from `CLAUDE.md`. If the project declares no `Test (slow)`, run its full test command once, as before. Per-wave verify runs never ran it.
 2. If any wave ran with `--light` (no reviewer), run the `verify` skill once with `--phase` over `git merge-base HEAD main..HEAD`, so the whole change gets one review. Its findings go through the normal fix rounds (limit 2).
 3. For an app with a UI or shell, also run the plan's `Smoke` task result: if it is automated, it must pass; if it is a manual check, or the plan has none, do NOT call the phase done. Say "built and verified by tests and review, not launched" and hand me the manual-check steps.
 4. Report: waves run, tasks done, rounds used per wave, findings fixed, tests added, unresolved items, and the number of Follow-ups with the plan path. Tell me the next step is to open a PR (the `pr` skill). Never push or open a PR yourself (irreversible: a gate).

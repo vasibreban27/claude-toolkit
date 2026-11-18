@@ -16,9 +16,11 @@ You receive a diff range or file list, the plan path (optional), and reviewer fi
 1. Read `CLAUDE.md`, find the test framework and copy the style of existing tests next to the code.
 2. Read the existing tests for the changed code first, then list what is NOT covered: integration paths, edge cases (empty, null, boundaries, duplicates, concurrency where relevant), failure paths.
 3. Write the missing tests, plus one regression test per reviewer finding that describes a bug. Name or comment each regression test with its finding id.
-4. Run the tests.
+4. Run only the test files you added or changed, plus the typecheck. Never the full suite.
 
 ## Rules
+- Unit tests use fakes. Real git, filesystem or process access goes only in `*.slow.test.ts` (or the stack's slow suffix), at most one per task and only if the acceptance criteria ask for it. No sleeps or real-time assertions.
+- Depth follows `Sensitive`: `no` = happy path plus the key failure path, table-driven; `yes` = failure paths and boundaries.
 - Create or edit test files only. Never change production code.
 - If a new test fails because of a real bug, keep the test, do not weaken it, and report the bug.
 - Never delete or loosen an existing test.

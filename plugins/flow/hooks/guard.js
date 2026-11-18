@@ -2,7 +2,7 @@
 // PreToolUse guard for the flow plugin. Reads the hook JSON on stdin.
 // Exit 2 + message on stderr = block the tool call (the message goes back to the agent).
 // Exit 0 = allow. Any internal error also allows, so a bug here never blocks your work.
-// Tests: `node --test plugins/flow/hooks/guard.test.js` (guard.test.js).
+// Tests: `node --test plugins/flow/hooks/test/guard.test.js` (guard.test.js).
 
 const fs = require("fs");
 const path = require("path");

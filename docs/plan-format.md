@@ -53,6 +53,7 @@ Each is one line `- Name: value`, except `Acceptance criteria`.
 - Task ids are unique. A dependency must exist and sit in a strictly earlier wave.
 - No two tasks in one wave own the same path, or a path inside another's.
 - Acceptance criteria never use an agent verdict ("auditor returns PASS"); use "No blocker or major findings after at most 2 fix rounds".
+- At most 5 acceptance criteria per task (bullets), each written as behaviour.
 - No unknown task fields, no duplicate fields.
 
 ## Changes the claude-desk parser needs for `flow-plan/1`
