@@ -6,7 +6,7 @@ const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
 
-const TIMING = path.join(__dirname, "timing.js");
+const TIMING = path.join(__dirname, "..", "timing.js");
 let proj;
 before(() => {
   proj = fs.mkdtempSync(path.join(os.tmpdir(), "timing-"));

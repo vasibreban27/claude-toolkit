@@ -30,6 +30,8 @@ one explicitly as `/flow:<name>`.
 Agents: `java-developer`, `python-developer`, `node-developer`, `frontend-developer`, `database-engineer` (workers),
 `reviewer` (sonnet, read-only), `test-writer`, `security-auditor` (opus for auth/crypto/secrets/payments, sonnet otherwise; read-only, conditional).
 
+Fast feedback (0.10.0): a project can declare `Test (fast)`, `Test (changed)` and `Test (slow)` commands in its `CLAUDE.md`. `verify` runs `Test (changed)` in `--light` and per-wave runs and `Test (fast)` in `--full` rounds, reports the test duration and raises `STOP: slow-tests` if the fast suite takes over 60 s; `build` runs `Test (slow)` once at Finish; the PR description says the slow suite runs in CI. Without these lines nothing changes. Workers run only their task's `Done when` command plus typecheck. Plans allow at most 5 acceptance criteria per task (checked by `plan-lint`).
+
 Hooks (`plugins/flow/hooks/`):
 - `guard.js` blocks secret-file access and unsafe git for you and all agents. It also auto-approves exactly known safe commands (read-only git, and the test/lint/typecheck commands written in your `CLAUDE.md`; no `&&`, `;`, `|` or redirects), so those stop prompting. `FLOW_ALLOWLIST=off` disables that. Its path lists are in `hooks/protected-paths.json`, shared with the app ([docs/protected-paths.md](docs/protected-paths.md)).
 - `session-start.js` (startup, resume, compact) injects up to 8 lines about the unfinished plan: branch, wave, counts, blockers, next step. Silent when there is none (`FLOW_SESSION_CONTEXT=off`).

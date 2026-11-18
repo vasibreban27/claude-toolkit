@@ -7,8 +7,8 @@ const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
 
-const GUARD = path.join(__dirname, "guard.js");
-const { allowReason, commandsFromClaudeMd } = require("./guard.js");
+const GUARD = path.join(__dirname, "..", "guard.js");
+const { allowReason, commandsFromClaudeMd } = require("../guard.js");
 
 let proj;
 const CLAUDE_MD = [

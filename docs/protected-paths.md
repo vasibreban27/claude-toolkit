@@ -21,4 +21,4 @@
 Not in the file (logic, documented in `guard.js`): applied migrations (a migration that already exists on `main` is immutable), force-push and `main` push rules, `--no-verify`, environment dumps, recursive deletes, and the subagent rules (explicit staging and commit paths).
 
 ## Changing the lists
-Edit the JSON, add a case to `plugins/flow/hooks/guard.test.js`, bump the plugin version, and tell the app. `hooks/shared.test.js` checks that every list exists and is non-empty, so a broken file fails CI instead of silently dropping protection.
+Edit the JSON, add a case to `plugins/flow/hooks/test/guard.test.js`, bump the plugin version, and tell the app. `hooks/test/shared.test.js` checks that every list exists and is non-empty, so a broken file fails CI instead of silently dropping protection.

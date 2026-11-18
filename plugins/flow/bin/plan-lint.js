@@ -14,6 +14,7 @@ const REQUIRED = ["Status", "Worker", "Size", "Sensitive", "Contract", "Owns", "
 const OPTIONAL = ["Model", "Tests"];
 const MAX_TASKS = 8;
 const MAX_SOURCE_FILES = 3;
+const MAX_CRITERIA = 5;
 const FIELD = /^- ([A-Za-z][A-Za-z ]*?):[ \t]*(.*)$/;
 const NON_SOURCE = /(^|\/)(tests?|__tests__|docs?)\/|\.(test|spec)\.[a-z]+$|\.md$/i;
 const AUDITOR_PASS = /\b(auditor|reviewer|security[- ]audit\w*)\b[^\n]*\bPASS\b/i;
@@ -157,6 +158,7 @@ function lint(text) {
     }
 
     if (t.fields["Acceptance criteria"] && !t.acceptance.length) err(t.fields["Acceptance criteria"].line, `${t.id}: Acceptance criteria needs at least one indented "- " bullet`);
+    if (t.acceptance.length > MAX_CRITERIA) err(t.fields["Acceptance criteria"].line, `${t.id}: ${t.acceptance.length} acceptance criteria; at most ${MAX_CRITERIA} per task, split the task`);
     for (const a of t.acceptance) {
       if (AUDITOR_PASS.test(a.text)) err(a.line, `${t.id}: do not use an agent verdict as acceptance; write "no blocker or major findings after at most 2 fix rounds"`);
     }

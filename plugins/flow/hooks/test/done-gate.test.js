@@ -3,9 +3,9 @@ const { test } = require("node:test");
 const assert = require("node:assert");
 const { spawnSync } = require("node:child_process");
 const path = require("node:path");
-const { check } = require("./done-gate.js");
+const { check } = require("../done-gate.js");
 
-const GATE = path.join(__dirname, "done-gate.js");
+const GATE = path.join(__dirname, "..", "done-gate.js");
 
 const DONE = 'Task: T3 – done\nFiles: a.ts\nTests: pass\n\nREPORT_JSON: {"task":"T3","status":"done","files":["a.ts"],"tests":"pass","stop":null}';
 const BLOCKED = 'Task: T3 – blocked\nSTOP: blocked: build is broken\n\nREPORT_JSON: {"task":"T3","status":"blocked","files":[],"tests":"none","stop":"blocked"}';

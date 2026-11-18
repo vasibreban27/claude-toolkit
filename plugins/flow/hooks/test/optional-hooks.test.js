@@ -5,10 +5,10 @@ const { spawnSync } = require("node:child_process");
 const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
-const { command, clean } = require("./notify.js");
+const { command, clean } = require("../notify.js");
 
-const NOTIFY = path.join(__dirname, "notify.js");
-const FORMAT = path.join(__dirname, "format.js");
+const NOTIFY = path.join(__dirname, "..", "notify.js");
+const FORMAT = path.join(__dirname, "..", "format.js");
 
 // ---- notify ----
 test("notify: command per platform keeps the message out of the shell", () => {

@@ -19,7 +19,12 @@ Take it from the arguments. Without a flag, derive it: find the plan tasks whose
 | `--phase` | Step 0 and the reviewer once over the whole range (the whole branch). No auditor (sensitive waves were audited already), no test-writer. Up to 2 fix rounds. |
 
 ## Step 0: cheap checks first (every mode)
-Run the project's compile/lint/test commands (from `CLAUDE.md`, `package.json`, `pom.xml` or `pyproject.toml`). If they fail, route the failures to the matching worker (see the table below) and re-run until they pass, counting each attempt as a round. Do not call the reviewer on a broken build. `--light` ends here: report and return control.
+Run the project's compile/lint commands and tests (from `CLAUDE.md`, `package.json`, `pom.xml` or `pyproject.toml`). Which tests depends on what `CLAUDE.md` declares:
+- `--light` and per-wave runs: `Test (changed)` (tests affected by the range).
+- `--full` rounds: `Test (fast)`.
+- Never `Test (slow)`; `build` Finish runs it once.
+- If the project declares none of these, run its normal test command as before.
+Measure the test duration and report it. If the fast suite takes over 60 s, add `STOP: slow-tests` with a suggestion to split slow tests out (`*.slow.test.ts`) into `Test (slow)`; this does not fail the run. If they fail, route the failures to the matching worker (see the table below) and re-run until they pass, counting each attempt as a round. Do not call the reviewer on a broken build. `--light` ends here: report and return control.
 
 ## Loop (at most 2 rounds; blocker and major findings only)
 Keep the HEAD sha at the start of each round.
@@ -54,4 +59,4 @@ A `blocker` or `major` without a reproduction (input or steps and the wrong resu
 an agent report has a `STOP:` line (its last line `REPORT_JSON:` carries the same data), a worker reports `partial` or `blocked` after one retry, a finding needs a design decision (`STOP: decision`), or a `blocker` or `major` finding is still open after round 2 (`STOP: limit`). Never start a third round on your own.
 
 ## Finish
-Report: mode, rounds used, findings fixed (and by which worker), minor findings left (listed, for Follow-ups), tests added, unresolved items. If you were called by the `build` skill, return control to it.
+Report: mode, rounds used, test duration (and the `STOP: slow-tests` line if raised), findings fixed (and by which worker), minor findings left (listed, for Follow-ups), tests added, unresolved items. If you were called by the `build` skill, return control to it.

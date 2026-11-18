@@ -39,10 +39,10 @@ Follow-ups left: <count by group> (see the plan)
 ## Why
 <the plan's story line, one sentence>
 ## How it was tested
-<test commands and results known from this session, and what was not run>
+<test commands and results known from this session, and what was not run. State that the slow suite runs in CI.>
 ## Reviewer notes
 <risks, sensitive tasks, skipped tests, open live checks, manual steps: only what exists>
 ## Follow-ups
 <the plan's Follow-ups, one line each, or "none">
 ```
-If Status is `not ready`, say the single next action in one line after the block. Do not soften the PR text: open items and skipped tests appear in it as they are.
+If Status is `not ready`, say the single next action in one line after the block. The PR description's "How it was tested" section always says the slow suite runs in CI (it is not run locally during verify). Do not soften the PR text: open items and skipped tests appear in it as they are.

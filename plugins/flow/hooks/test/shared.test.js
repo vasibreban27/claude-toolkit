@@ -4,9 +4,9 @@ const { test } = require("node:test");
 const assert = require("node:assert");
 const fs = require("node:fs");
 const path = require("node:path");
-const { check } = require("./done-gate.js");
+const { check } = require("../done-gate.js");
 
-const FLOW = path.join(__dirname, "..");
+const FLOW = path.join(__dirname, "..", "..");
 const REPO = path.join(FLOW, "..", "..");
 const read = (...p) => fs.readFileSync(path.join(...p), "utf8");
 
@@ -37,7 +37,7 @@ test("worker prompts do not contradict the report rules", () => {
 
 // ---- protected-paths.json ----
 test("protected-paths.json has every list, non-empty, no duplicates", () => {
-  const pp = JSON.parse(read(__dirname, "protected-paths.json"));
+  const pp = JSON.parse(read(__dirname, "..", "protected-paths.json"));
   const lists = {
     secrets: ["envSafeSuffixes", "keyExtensions", "sshKeyNames", "names", "dirs", "productionConfigEnvs"],
     noise: ["anywhere", "projectLevel", "projectMarkers", "fileSuffixes"],
@@ -86,5 +86,5 @@ test("REPORT_JSON examples in docs/report-json.md pass the done gate", () => {
 });
 test("STOP codes in docs match the gate", () => {
   const doc = read(REPO, "docs", "report-json.md");
-  for (const code of require("./done-gate.js").STOP_CODES) assert.ok(doc.includes("`" + code + "`"), code);
+  for (const code of require("../done-gate.js").STOP_CODES) assert.ok(doc.includes("`" + code + "`"), code);
 });

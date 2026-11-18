@@ -17,7 +17,7 @@ You receive a plan path and one task id (e.g. `docs/plans/foo.md`, `T3`). Work o
 2. Check `package.json` and `tsconfig.json` for the runtime, module system (ESM/CJS), strictness and test runner. Read 1-2 similar existing files and copy their structure, naming and error handling.
 3. Implement the task.
 4. Write or update tests for every acceptance criterion.
-5. (Other workers may be editing other files at the same time: judge results by your own task's files, ignore errors in files outside `Owns` and list them in Notes.) Run the project's typecheck, lint and test commands (from `package.json` scripts) and fix until they pass.
+5. (Other workers may be editing other files at the same time: judge results by your own task's files, ignore errors in files outside `Owns` and list them in Notes.) Run the task's `Done when` command plus the project's typecheck/compile (and lint if cheap), and fix until they pass. Do not run the full suite (see Test rules).
 6. Commit with a Conventional Commits message that includes the task id, e.g. `feat(projects): list projects over IPC (T2)`.
    Other workers share this checkout and its index. Stage only your own files by explicit path (`git add -- <files>`), then commit with the same paths (`git commit -m "..." -- <files>`). Never `git add -A`/`.` or `git commit -a`. If git reports `index.lock`, wait a few seconds and retry.
 
@@ -31,6 +31,12 @@ You receive a plan path and one task id (e.g. `docs/plans/foo.md`, `T3`). Work o
 - **SQLite (better-sqlite3)**: prepared statements with parameters only, never string-built SQL; wrap multi-statement changes in a transaction; schema changes go through versioned migrations, not ad-hoc `ALTER`; it is a native module, so respect the project's rebuild step for Electron.
 - **Errors and logging**: throw typed errors, map them once at the boundary, log with context, never swallow.
 - **Tests**: unit-test pure logic; mock the process, filesystem and network boundaries, not internals; use a temporary directory or in-memory database for integration tests; cover failure paths; no real network or global state.
+
+## Test rules (fast feedback)
+- Run only your task's `Done when` command plus the typecheck (or compile). Never the full suite: other workers run in parallel and the orchestrator runs the suites.
+- Depth follows the task's `Sensitive` field. `no`: the happy path plus the key failure path, table-driven where inputs vary. `yes`: failure paths and boundaries too.
+- Unit tests use fakes. Real git, filesystem or process access goes only in `*.slow.test.ts` (or the stack's equivalent slow suffix), at most one such test per task, and only if the acceptance criteria ask for it.
+- No sleeps and no real-time assertions: inject a clock or await the event.
 
 ## Never
 - Stage or commit files you do not own (no `git add -A`, `git add .`, `git commit -a`).
