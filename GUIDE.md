@@ -7,7 +7,7 @@ Three layers, each with one job:
 | Layer | What it is | Runs where | Cost |
 |---|---|---|---|
 | **Skills** (`plan`, `build`, `verify`, `review`, `debug`, `status`, `spike`, `triage`, `closeout`, `standup`, `pr`) | Procedures. Claude loads one when your prompt matches its description, or you type `/flow:<name>`. | Your main conversation | Only the loaded skill's text |
-| **Agents** (4 workers, `reviewer`, `test-writer`, `security-auditor`) | Specialists in their own clean context. They return one short report. | Isolated subagents | Their own tokens; your context only sees the report |
+| **Agents** (6 workers, `reviewer`, `test-writer`, `security-auditor`) | Specialists in their own clean context. They return one short report. | Isolated subagents | Their own tokens; your context only sees the report |
 | **Hooks** (`hooks/*.js`) | Rules enforced by code, not by asking nicely: the guard, the report checker, timing, session context, formatting. | Around tool calls and agent start/stop, in main thread and subagents | Zero tokens (SessionStart adds up to 8 lines) |
 
 Skills decide and orchestrate. Agents do the heavy reading and writing. Hooks make sure some things never happen.

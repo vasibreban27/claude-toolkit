@@ -6,7 +6,7 @@
 const fs = require("node:fs");
 
 const FORMAT = "flow-plan/1";
-const WORKERS = ["java-developer", "python-developer", "node-developer", "frontend-developer", "database-engineer"];
+const WORKERS = ["java-developer", "python-developer", "node-developer", "frontend-developer", "database-engineer", "general-developer"];
 const STATUS = /^\[( |~|x|!)\] (todo|built|verified|blocked(: .+)?)$/;
 const AUTONOMY = ["supervised", "checkpoints", "autonomous"];
 const MODELS = ["haiku", "sonnet", "opus"];
@@ -127,7 +127,7 @@ function lint(text) {
     for (const k of REQUIRED) if (!t.fields[k]) err(t.line, `${t.id}: missing field "${k}"`);
 
     if (f("Status") !== undefined && !STATUS.test(f("Status"))) err(t.fields.Status.line, `${t.id}: Status must be "[ ] todo", "[~] built", "[x] verified" or "[!] blocked: <note>"`);
-    if (f("Worker") !== undefined && !WORKERS.includes(f("Worker"))) err(t.fields.Worker.line, `${t.id}: Worker must be one of ${WORKERS.join(" | ")}`);
+    if (f("Worker") !== undefined && !WORKERS.includes(f("Worker"))) err(t.fields.Worker.line, `${t.id}: Worker must be one of ${WORKERS.join(" | ")}; use general-developer for a stack with no specialist (Rust, Go, C#, ...), never invent a worker name`);
     if (f("Size") !== undefined) {
       if (!/^[SML]$/.test(f("Size"))) err(t.fields.Size.line, `${t.id}: Size must be S, M or L`);
       else if (f("Size") === "L") err(t.fields.Size.line, `${t.id}: Size L is not allowed, split the task`);
