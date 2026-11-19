@@ -15,7 +15,7 @@ Version: the footer has no version field. A change to the keys below is a toolki
 | `limit` | round limit, cost cap or time cap reached (raised by the orchestrator) | yes |
 | `slow-tests` | the fast suite took over 60 s in `verify` (raised by the orchestrator, advisory: suggests splitting slow tests out) | no |
 
-## Workers (`java-developer`, `python-developer`, `node-developer`, `frontend-developer`, `database-engineer`)
+## Workers (`java-developer`, `python-developer`, `node-developer`, `frontend-developer`, `database-engineer`, `general-developer`)
 Text: a line `Task: <id> – done | partial | blocked`, then a `STOP:` line when not done.
 ```
 REPORT_JSON: {"task":"T3","status":"done","files":["src/a.ts"],"tests":"pass","stop":null}

@@ -4,7 +4,7 @@
 // Report formats are defined in the agents' own files and in skills/build/SKILL.md (STOP codes).
 "use strict";
 
-const WORKERS = ["java-developer", "python-developer", "node-developer", "frontend-developer", "database-engineer"];
+const WORKERS = ["java-developer", "python-developer", "node-developer", "frontend-developer", "database-engineer", "general-developer"];
 const REVIEWERS = ["reviewer", "security-auditor"];
 const STOP_CODES = ["blocked", "scope", "decision", "limit"];
 const AGENT_RE = /^(?:flow:)?([a-z-]+)$/;

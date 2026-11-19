@@ -27,7 +27,7 @@ one explicitly as `/flow:<name>`.
 | `standup` | Short daily summary (done, doing, blocked) from git history and plan status (read-only) | yes |
 | `pr` | Commit, push, open a PR (refuses on main, needs passing tests) | no (explicit only) |
 
-Agents: `java-developer`, `python-developer`, `node-developer`, `frontend-developer`, `database-engineer` (workers),
+Agents: `java-developer`, `python-developer`, `node-developer`, `frontend-developer`, `database-engineer`, `general-developer` (workers),
 `reviewer` (sonnet, read-only), `test-writer`, `security-auditor` (opus for auth/crypto/secrets/payments, sonnet otherwise; read-only, conditional).
 
 Fast feedback (0.10.0): a project can declare `Test (fast)`, `Test (changed)` and `Test (slow)` commands in its `CLAUDE.md`. `verify` runs `Test (changed)` in `--light` and per-wave runs and `Test (fast)` in `--full` rounds, reports the test duration and raises `STOP: slow-tests` if the fast suite takes over 60 s; `build` runs `Test (slow)` once at Finish; the PR description says the slow suite runs in CI. Without these lines nothing changes. Workers run only their task's `Done when` command plus typecheck. Plans allow at most 5 acceptance criteria per task (checked by `plan-lint`).

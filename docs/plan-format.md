@@ -36,7 +36,7 @@ Each is one line `- Name: value`, except `Acceptance criteria`.
 | Field | Required | Value |
 |---|---|---|
 | `Status` | yes | `[ ] todo`, `[~] built`, `[x] verified`, `[!] blocked: <note>`; only `build` edits it |
-| `Worker` | yes | `java-developer`, `python-developer`, `node-developer`, `frontend-developer`, `database-engineer` |
+| `Worker` | yes | `java-developer`, `python-developer`, `node-developer`, `frontend-developer`, `database-engineer`, `general-developer` |
 | `Size` | yes | `S` or `M`; `L` is rejected (split the task) |
 | `Sensitive` | yes | `yes` or `no`; `yes` when the task touches authn/authz, input handling, query building, secrets or config, file or path handling, crypto or payments |
 | `Model` | no | `haiku`, `sonnet` or `opus`; default `sonnet`; `haiku` for mechanical work |

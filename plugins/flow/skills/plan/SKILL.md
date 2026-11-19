@@ -48,7 +48,7 @@ List every endpoint with method, path, auth, request/response DTO fields and typ
 ```
 ### T1: <title>
 - Status: [ ] todo
-- Worker: java-developer | python-developer | node-developer | frontend-developer | database-engineer
+- Worker: java-developer | python-developer | node-developer | frontend-developer | database-engineer | general-developer
 - Size: S | M
 - Sensitive: yes | no
 - Model: sonnet | haiku                  (optional; default sonnet, haiku for mechanical work)
@@ -67,7 +67,7 @@ List every endpoint with method, path, auth, request/response DTO fields and typ
 - **Sensitive: yes** when the task touches authentication or authorization, request/input handling, query building, secrets or config, file or path handling, crypto or payments. This decides whether `verify` runs the security auditor and the reviewer on its wave, so do not under-mark.
 - **Spikes first**: if an unknown changes the design (a library limit, an API behavior), make a spike task in Wave 1 that ends in `docs/notes/<slug>-spike.md` with one-line decisions later tasks can cite. State in its criteria what is decided differently if the answer is negative (stop and re-plan before the next wave).
 - **Contracts first**: when tasks share types or interfaces, Wave 1 is a short contracts task that owns them, so the next wave runs fully in parallel.
-- One worker per task. Pick the worker by stack; split a task that spans two stacks (migration vs. service code).
+- One worker per task. Pick the worker by the files the task owns: Java → `java-developer`, Python → `python-developer`, Node/TypeScript outside the UI → `node-developer`, UI (Angular/React, renderer) → `frontend-developer`, SQL and migrations → `database-engineer`. Any other language (Rust, Go, C#, Kotlin, Swift, PHP, Ruby, shell, ...) or a mixed or unclear stack → `general-developer`. Never invent a worker name such as `rust-developer`: `plan-lint` rejects it. Split a task that spans two stacks (migration vs. service code).
 - A wave contains tasks that can run in parallel. Tasks in the same wave must not own the same file or one inside the other. If they would, move one to a later wave.
 - A task that uses a dependency, type, file or config created by another task goes in a **later wave**. A task that adds a dependency owns `package.json`/`pom.xml` and the lockfile alone in its wave.
 - Database tasks normally come in an earlier wave than the code that uses them.

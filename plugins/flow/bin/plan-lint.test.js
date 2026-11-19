@@ -56,6 +56,14 @@ test("enum fields", () => {
   has(VALID.replace("- Status: [ ] todo", "- Status: pending"), /Status must be/);
 });
 
+test("general-developer is accepted, invented workers are rejected with a hint", () => {
+  assert.deepStrictEqual(msgs(VALID.replace("- Worker: node-developer", "- Worker: general-developer")), []);
+  const errs = msgs(VALID.replace("- Worker: node-developer", "- Worker: rust-developer"));
+  assert.strictEqual(errs.length, 1);
+  assert.match(errs[0], /Worker must be one of .*general-developer/);
+  assert.match(errs[0], /use general-developer for a stack with no specialist/);
+});
+
 test("duplicate task id", () => {
   has(VALID.replace("### T3:", "### T2:"), /duplicate task id T2/);
 });
