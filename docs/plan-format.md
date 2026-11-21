@@ -16,7 +16,7 @@ Autonomy: supervised | checkpoints | autonomous      (optional header field)
 # <title>
 ## Goal
 ## Scope
-## Architecture            (with an "### API contract" subsection when an API changes)
+## Architecture            ("### Layout" when a task creates a file; "### API contract" when an API changes)
 ## Changes per layer
 ## Risks
 ## Test strategy
@@ -29,6 +29,10 @@ Autonomy: supervised | checkpoints | autonomous      (optional header field)
 ```
 - Line 1 is exactly `Format: flow-plan/1`. Header fields sit between it and the first heading.
 - Waves are `## Wave <n>` headings, numbered 1, 2, 3 in order. Tasks are `### T<n>: <title>` headings inside a wave. Lint requires `## Goal`, `## Follow-ups` and at least one wave.
+
+## Architecture subsections
+- `### Layout`: the directories new files go in, one per line, after a `Source:` line naming what decided it: `CLAUDE.md` (its `## Project layout`), `existing` (the project's current structure) or `conventions/<stack>.md` (the flow plugin's house layout, for a new project or stack). `Owns` paths for new code sit inside these directories. Workers place files by it. Not checked by `plan-lint`; the parser can ignore it.
+- `### API contract`: see `skills/plan/SKILL.md`.
 
 ## Task fields
 Each is one line `- Name: value`, except `Acceptance criteria`.

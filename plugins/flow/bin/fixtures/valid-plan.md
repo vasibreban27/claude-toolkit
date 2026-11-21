@@ -14,6 +14,13 @@ In: endpoint, service, UI button. Out: refunds.
 ## Architecture
 Service method on `OrderService`; the UI calls the endpoint.
 
+### Layout
+```
+Source: existing (feature package shop/orders)
+src/main/java/shop/orders/        OrderService, OrderController
+web/src/app/orders/                cancel dialog in order-detail
+```
+
 ### API contract
 ```
 POST /api/orders/{id}/cancel   auth: ROLE_USER (owner only)
