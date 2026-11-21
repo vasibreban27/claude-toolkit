@@ -18,7 +18,7 @@ You are debugging with me, in the main thread. Do not write a plan file and do n
 
 ## 3. Fix
 - Make the smallest change that removes the root cause, not the symptom. No refactors, no drive-by cleanups.
-- Respect the project's conventions in `CLAUDE.md`. Never touch `.env` or secret files.
+- Respect the project's conventions in `CLAUDE.md`. A new file goes where its `## Project layout` or the existing structure puts it; if neither answers, use the `## Layout` of `${CLAUDE_PLUGIN_ROOT}/conventions/<stack>.md`. Never touch `.env` or secret files.
 
 ## 4. Regression test
 - Write a test that fails before the fix and passes after it. Run it both ways when cheap.

@@ -22,16 +22,9 @@ You receive a plan path and one task id (e.g. `docs/plans/foo.md`, `T3`). Work o
 7. Commit with a Conventional Commits message that includes the task id, e.g. `feat(cli): add export command (T2)`.
    Other workers share this checkout and its index. Stage only your own files by explicit path (`git add -- <files>`), then commit with the same paths (`git commit -m "..." -- <files>`). Never `git add -A`/`.` or `git commit -a`. If git reports `index.lock`, wait a few seconds and retry.
 
-## Guidance (what commonly goes wrong)
-- **Tooling**: use the stack's idiomatic formatter and linter only if the project already uses it (`rustfmt`/`clippy`, `gofmt`/`go vet`, `dotnet format`, `ktlint`, ...). Never introduce a new tool, framework or dependency without reporting it in the notes. Do not guess commands: if neither `CLAUDE.md`, CI nor the manifest names one, use the toolchain's standard command and say so in the notes.
-- **Idioms**: write the language the way the neighbouring code does (error values vs. exceptions, ownership and nullability rules, async model); do not port patterns from another language.
-- **Boundaries**: validate data crossing a boundary (CLI args, HTTP, IPC, JSON, DB rows, process output) at the edge and type it after.
-- **Child processes**: pass an argument array, never a string-built shell command; set the working directory; handle non-zero exit, stderr and timeouts. In shell scripts, quote every variable and fail fast (`set -euo pipefail` or the project's equivalent).
-- **Queries**: parameters only, never string-built SQL or filters.
-- **Paths and OS**: use the language's path helpers, no hardcoded separators; the project must work on Windows, macOS and Linux unless `CLAUDE.md` says otherwise.
-- **Secrets**: never log or persist keys, tokens or passwords in plaintext; read them from the environment or the project's secret store.
-- **Errors and logging**: map errors once at the boundary, log with context, never swallow.
-- **Tests**: unit-test pure logic; mock the process, filesystem and network boundaries, not internals; use a temporary directory or in-memory store for integration tests; cover failure paths; no real network or global state.
+## Conventions
+Before coding, read `${CLAUDE_PLUGIN_ROOT}/conventions/general.md`: its `## Layout` says where new files go, its `## Rules` are the stack defaults. The same file guides the planner, so the plan's paths and your code agree.
+Where to put a new file, in this order: `CLAUDE.md`, the plan's `### Layout` (in Architecture), the project's existing structure, then that file's `## Layout`. Your task's `Owns` is final: if the layout says a file belongs outside `Owns`, do not move it there; stop with `STOP: scope`. If the conventions file cannot be read, say so in Notes and go on with the plan and the existing code.
 
 ## Test rules (fast feedback)
 - Run only your task's `Done when` command plus the build/typecheck. Never the full suite: other workers run in parallel and the orchestrator runs the suites.

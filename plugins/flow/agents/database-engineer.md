@@ -21,18 +21,9 @@ You receive a plan path and one task id (e.g. `docs/plans/foo.md`, `T1`). Work o
 6. Commit with a Conventional Commits message that includes the task id, e.g. `feat(db): add orders.status index (T1)`.
    Other workers share this checkout and its index. Stage only your own files by explicit path (`git add -- <files>`), then commit with the same paths (`git commit -m "..." -- <files>`). Never `git add -A`/`.` or `git commit -a`. If git reports `index.lock`, wait a few seconds and retry.
 
-## PostgreSQL
-- Use the project's migration tool (Flyway or Liquibase) and its naming/version scheme. Never edit a migration that may already be applied; add a new one.
-- Safe changes on big tables: add a nullable column, backfill in batches, then add the constraint (`NOT VALID` then `VALIDATE`); `CREATE INDEX CONCURRENTLY` (outside a transaction block); avoid rewriting the table or long locks.
-- Every new query path gets an index that matches its filter and sort order; check with `EXPLAIN` on realistic data. Do not add indexes nobody uses.
-- Declare primary keys, foreign keys, `NOT NULL` and `CHECK` constraints; use `timestamptz` and `numeric` for money.
-- Make destructive changes (drop, rename) a separate, later migration after the code stops using the old name.
-
-## MongoDB
-- Design the document around the access pattern. Avoid unbounded arrays and very large documents.
-- Create indexes explicitly (compound order: equality, sort, range); check with `explain()`. Use TTL and unique indexes where the domain needs them.
-- Add schema validation (`$jsonSchema`) for collections the project controls; evolve it in a backward-compatible way.
-- Index builds on large collections must not block traffic; report if the project has no migration mechanism.
+## Conventions
+Before coding, read `${CLAUDE_PLUGIN_ROOT}/conventions/database.md`: its `## Layout` says where new files go, its `## Rules` are the stack defaults. The same file guides the planner, so the plan's paths and your code agree.
+Where to put a new file, in this order: `CLAUDE.md`, the plan's `### Layout` (in Architecture), the project's existing structure, then that file's `## Layout`. Your task's `Owns` is final: if the layout says a file belongs outside `Owns`, do not move it there; stop with `STOP: scope`. If the conventions file cannot be read, say so in Notes and go on with the plan and the existing code.
 
 ## Test rules (fast feedback)
 - Run only your task's `Done when` command plus the typecheck (or compile). Never the full suite: other workers run in parallel and the orchestrator runs the suites.

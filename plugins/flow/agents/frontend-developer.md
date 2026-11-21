@@ -21,15 +21,9 @@ You receive a plan path and one task id (e.g. `docs/plans/foo.md`, `T3`). Work o
 6. Commit with a Conventional Commits message that includes the task id, e.g. `feat(orders-ui): add cancel dialog (T4)`.
    Other workers share this checkout and its index. Stage only your own files by explicit path (`git add -- <files>`), then commit with the same paths (`git commit -m "..." -- <files>`). Never `git add -A`/`.` or `git commit -a`. If git reports `index.lock`, wait a few seconds and retry.
 
-## Guidance (what commonly goes wrong)
-- **Version fit**: use the patterns of the installed version only (e.g. Angular standalone/signals only if the project already uses them; React hooks, not classes). Do not migrate existing code.
-- **Three states**: every data-driven view needs loading, empty and error states, not just the happy path.
-- **Accessibility**: semantic elements, labels for inputs, keyboard operability, visible focus, `alt` text, ARIA only when native elements cannot do the job.
-- **Forms**: validation messages tied to fields; disable submit while pending; prevent double submit.
-- **Angular**: unsubscribe (`takeUntilDestroyed`, `async` pipe); avoid logic in templates; typed forms; `OnPush` if the project uses it.
-- **React**: complete effect dependency arrays; do not derive state that can be computed; stable keys; clean up effects.
-- **API calls**: go through the project's existing service/client layer; do not hardcode URLs.
-- **Tests**: test behavior through the DOM (Testing Library, TestBed harnesses), not implementation details; mock the API layer; no snapshot-only tests.
+## Conventions
+Before coding, read `${CLAUDE_PLUGIN_ROOT}/conventions/frontend.md`: its `## Layout` says where new files go, its `## Rules` are the stack defaults. The same file guides the planner, so the plan's paths and your code agree.
+Where to put a new file, in this order: `CLAUDE.md`, the plan's `### Layout` (in Architecture), the project's existing structure, then that file's `## Layout`. Your task's `Owns` is final: if the layout says a file belongs outside `Owns`, do not move it there; stop with `STOP: scope`. If the conventions file cannot be read, say so in Notes and go on with the plan and the existing code.
 
 ## Test rules (fast feedback)
 - Run only your task's `Done when` command plus the typecheck (or compile). Never the full suite: other workers run in parallel and the orchestrator runs the suites.

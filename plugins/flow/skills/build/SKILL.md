@@ -51,8 +51,8 @@ Each task has a `Status:` line. You are the only one who edits it; workers never
 ## Setup
 1. Read the plan. Run `node "${CLAUDE_PLUGIN_ROOT}/bin/plan-lint.js" <plan>`; on errors, show them and stop (a gate: the plan needs fixing). If the script cannot be found, continue and say "plan not linted". Note the start time. List tasks, workers, `Owns`, `Depends on`, `Sensitive`, `Status` and waves. Resolve `autonomy` as above.
    **Resume**: skip tasks that are `[x]`. A wave whose tasks are all `[~]` goes straight to its verify step (use the range `git merge-base HEAD main..HEAD`). Re-dispatch `[ ]` and `[!]` tasks. Say in one line where you are resuming.
-2. Make sure the work is on a feature branch, not main or master, with a clean tree. If the only uncommitted changes are the plan file, `.gitignore` or other docs, commit them (`docs: update plan`) without asking. For any other uncommitted change, ask me.
-3. **Small plan shortcut**: if the plan has a single task touching one file, implement it directly in the main thread, run the tests, and skip to Finish (no agents, no verify loop).
+2. Make sure the work is on a feature branch, not main or master, with a clean tree. If the only uncommitted changes are the plan file, `.gitignore`, a `## Project layout` section in `CLAUDE.md` or other docs, commit them (`docs: update plan`) without asking. For any other uncommitted change, ask me.
+3. **Small plan shortcut**: if the plan has a single task touching one file, implement it directly in the main thread (new files go where the plan's `### Layout` says), run the tests, and skip to Finish (no agents, no verify loop).
 
 ## For each wave, in order
 1. Record the base commit: `BASE=$(git rev-parse HEAD)`.

@@ -57,7 +57,7 @@ Before each wave `build` refuses to launch tasks whose `Owns` overlap, and after
 ## Tuning knobs (where to change what)
 | You want | Edit |
 |---|---|
-| Different stack guidance | `agents/<worker>.md` (the "what commonly goes wrong" section) |
+| Different stack guidance or package layout | `conventions/<stack>.md` (`## Layout` for where files go, `## Rules` for the stack defaults); the planner and the matching worker both read it |
 | Stricter or looser reviews | `agents/reviewer.md` (checks, severity rules) |
 | When security runs | `Sensitive:` per task in the plan; fallback surface check in `skills/verify/SKILL.md` (the Security paragraph) |
 | What the auditor treats as in scope | `docs/threat-model.md` in the project (template: `docs/threat-model.template.md`) |
@@ -66,7 +66,7 @@ Before each wave `build` refuses to launch tasks whose `Owns` overlap, and after
 | A skill must not auto-trigger | add `disable-model-invocation: true` to its frontmatter |
 | Cheaper/faster agents | `model:` in the agent's frontmatter (`sonnet`, `haiku`, `opus`) |
 | Test speed | `Test (fast)`, `Test (changed)`, `Test (slow)` lines in your project's `CLAUDE.md`; worker test rules in `agents/<worker>.md` ("Test rules"); slow tests go in `*.slow.test.ts` |
-| Project conventions | your project's `CLAUDE.md`; every agent reads it first and it beats the agent files |
+| Project conventions | your project's `CLAUDE.md`; every agent reads it first and it beats the agent and conventions files. A `## Project layout` section fixes the package/folder structure; `plan` writes one for a new project |
 
 ## Hooks: rules that always apply
 

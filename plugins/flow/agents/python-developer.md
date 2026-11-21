@@ -21,16 +21,9 @@ You receive a plan path and one task id (e.g. `docs/plans/foo.md`, `T3`). Work o
 6. Commit with a Conventional Commits message that includes the task id, e.g. `fix(billing): round invoice totals (T2)`.
    Other workers share this checkout and its index. Stage only your own files by explicit path (`git add -- <files>`), then commit with the same paths (`git commit -m "..." -- <files>`). Never `git add -A`/`.` or `git commit -a`. If git reports `index.lock`, wait a few seconds and retry.
 
-## Python guidance (what commonly goes wrong)
-- **Environment**: use the project's existing venv/uv/poetry setup; do not create a new one or `pip install` globally.
-- **Typing**: add type hints matching the project's strictness; keep `mypy`/`pyright` clean.
-- **Mutable defaults**: never `def f(x=[])`; use `None` and create inside.
-- **Exceptions**: catch specific exceptions, never bare `except:`; re-raise with context (`raise ... from e`).
-- **Resources**: use `with` for files, connections and sessions; always set timeouts on HTTP calls.
-- **Boundaries**: validate external input at the edge (Pydantic or dataclasses as the project does); keep I/O out of pure logic.
-- **Async**: do not call blocking code inside `async def`; do not mix sync and async DB sessions.
-- **Naive datetimes**: use timezone-aware datetimes; store UTC.
-- **Tests**: pytest with fixtures; one behavior per test; no shared mutable state between tests; mock at the boundary (network, clock), not internals; cover error paths.
+## Conventions
+Before coding, read `${CLAUDE_PLUGIN_ROOT}/conventions/python.md`: its `## Layout` says where new files go, its `## Rules` are the stack defaults. The same file guides the planner, so the plan's paths and your code agree.
+Where to put a new file, in this order: `CLAUDE.md`, the plan's `### Layout` (in Architecture), the project's existing structure, then that file's `## Layout`. Your task's `Owns` is final: if the layout says a file belongs outside `Owns`, do not move it there; stop with `STOP: scope`. If the conventions file cannot be read, say so in Notes and go on with the plan and the existing code.
 
 ## Test rules (fast feedback)
 - Run only your task's `Done when` command plus the typecheck (or compile). Never the full suite: other workers run in parallel and the orchestrator runs the suites.

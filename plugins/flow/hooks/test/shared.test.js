@@ -88,3 +88,24 @@ test("STOP codes in docs match the gate", () => {
   const doc = read(REPO, "docs", "report-json.md");
   for (const code of require("../done-gate.js").STOP_CODES) assert.ok(doc.includes("`" + code + "`"), code);
 });
+
+// ---- conventions/ (shared by the plan skill and the workers) ----
+const CONVENTIONS = { "java-developer": "java", "python-developer": "python", "node-developer": "node", "frontend-developer": "frontend", "database-engineer": "database", "general-developer": "general" };
+for (const [worker, stack] of Object.entries(CONVENTIONS)) {
+  test(`conventions/${stack}.md exists with Layout and Rules, and ${worker} reads it`, () => {
+    const conv = read(FLOW, "conventions", `${stack}.md`);
+    assert.match(conv, /^## Layout$/m, "missing ## Layout");
+    assert.match(conv, /^## Rules$/m, "missing ## Rules");
+    assert.ok(conv.endsWith("\n") && !conv.includes("\r"), "LF line endings, trailing newline");
+    const agent = read(FLOW, "agents", `${worker}.md`);
+    assert.ok(agent.includes("${CLAUDE_PLUGIN_ROOT}/conventions/" + stack + ".md"), `${worker} does not point at its conventions file`);
+    assert.doesNotMatch(agent, /^## (House conventions|Guidance|Python guidance|PostgreSQL)/m, `${worker} keeps its own copy of the stack rules`);
+  });
+}
+test("plan skill reads the conventions layout and names every stack", () => {
+  const plan = read(FLOW, "skills", "plan", "SKILL.md");
+  assert.ok(plan.includes("${CLAUDE_PLUGIN_ROOT}/conventions/<stack>.md"));
+  for (const stack of Object.values(CONVENTIONS)) assert.ok(plan.includes("`" + stack + "`"), `plan skill does not name ${stack}`);
+  assert.match(plan, /### Layout/);
+  assert.match(plan, /## Project layout/);
+});
